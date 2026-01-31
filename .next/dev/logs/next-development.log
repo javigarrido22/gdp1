@@ -1,3 +1,51 @@
+<<<<<<< HEAD
+[00:00:07.920] Server  LOG     ✓ Ready in 6.6s
+[00:00:14.114] Server  LOG     ○ Compiling / ...
+[00:00:22.812] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:26.251] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:34.381] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:42.469] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:48.638] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:16:54.289] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:17:08.331] Browser ERROR   ./app/page.tsx:1:17
+Ecmascript file had an error
+> 1 | import React, { useState } from "react";
+    |                 ^^^^^^^^
+  2 |
+  3 | const Ingresos = () => {
+  4 |   const [ingresos, setIngresos] = useState([
+
+You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+
+ Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+[00:17:08.604] Browser ERROR   ./app/page.tsx:1:17
+Ecmascript file had an error
+> 1 | import React, { useState } from "react";
+    |                 ^^^^^^^^
+  2 |
+  3 | const Ingresos = () => {
+  4 |   const [ingresos, setIngresos] = useState([
+
+You're importing a component that needs `useState`. This React Hook only works in a Client Component. To fix, mark the file (or its parent) with the `"use client"` directive.
+
+ Learn more: https://nextjs.org/docs/app/api-reference/directives/use-client
+[00:17:57.029] Server  LOG     ✓ Compiled in 217ms
+[00:17:59.092] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:18:51.770] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:18:52.027] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:20:55.278] Server  LOG     ✓ Compiled in 121ms
+[00:23:24.389] Server  LOG     ✓ Compiled in 59ms
+[00:23:27.539] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:23:44.116] Server  LOG     ✓ Compiled in 161ms
+[00:26:38.995] Server  LOG     ✓ Compiled in 2.2s
+[00:26:56.168] Server  LOG     ✓ Compiled in 158ms
+[00:26:58.815] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:41:16.670] Server  LOG     ✓ Compiled in 288ms
+[00:42:38.727] Server  LOG     ✓ Compiled in 855ms
+[00:44:10.198] Server  LOG     ✓ Compiled in 396ms
+[00:44:13.871] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:44:35.571] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+=======
 [00:00:02.740] Server  LOG     ✓ Ready in 1944ms
 [00:00:10.801] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 [00:06:54.978] Server  LOG     ✓ Compiled in 47ms
@@ -7,3 +55,4 @@
 [00:07:04.443] Server  LOG     ✓ Compiled in 1438ms
 [00:08:13.748] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 [00:08:16.053] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+>>>>>>> fddb0ddbf269489a5818ca1e71716ef521afb000
