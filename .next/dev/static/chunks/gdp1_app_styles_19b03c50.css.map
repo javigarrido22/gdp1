@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/javie/gdp1/app/styles.css"],"sourcesContent":[".App { background-color: #141414; color: white; padding: 20px; font-family: Arial, sans-serif; } h1 { margin-bottom: 20px; } .carrusel { display: flex; gap: 15px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 10px; } .card { min-width: 220px; background-color: #222; border-radius: 8px; padding: 15px; text-align: center; transition: transform 0.3s; } .card:hover { transform: scale(1.05); cursor: pointer; } .positivo { color: #4caf50; /* verde */ } .negativo { color: #f44336; /* rojo */ }"],"names":[],"mappings":"AAAA;;;;;;;AAAiG;;;;AAA4B;;;;;;;;AAAyG;;;;;;;;;AAAuI;;;;;AAAyD;;;;AAA0C"}}]
+}
