@@ -7,16 +7,16 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 // Registrar los componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-const Ingresos = () => {
-  const [ingresos, setIngresos] = useState([
-    { id: 1, fecha: "2023-01-15", descripcion: "Salario", monto: 1500 },
-    { id: 2, fecha: "2023-02-10", descripcion: "Venta de productos", monto: 300 },
-    { id: 3, fecha: "2023-02-20", descripcion: "Intereses bancarios", monto: 50 },
-    { id: 4, fecha: "2023-03-05", descripcion: "Proyecto freelance", monto: 800 },
-    { id: 5, fecha: "2023-03-15", descripcion: "Venta de equipo", monto: 400 },
+const Gastos = () => {
+  const [gastos, setGastos] = useState([
+    { id: 1, fecha: "2023-01-15", descripcion: "Alquiler", monto: 500 },
+    { id: 2, fecha: "2023-02-10", descripcion: "Supermercado", monto: 200 },
+    { id: 3, fecha: "2023-02-20", descripcion: "Transporte", monto: 50 },
+    { id: 4, fecha: "2023-03-05", descripcion: "Entretenimiento", monto: 100 },
+    { id: 5, fecha: "2023-03-15", descripcion: "Servicios", monto: 150 },
   ]);
 
-  const [nuevoIngreso, setNuevoIngreso] = useState({
+  const [nuevoGasto, setNuevoGasto] = useState({
     fecha: "",
     descripcion: "",
     monto: "",
@@ -26,6 +26,7 @@ const Ingresos = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mensajeExito, setMensajeExito] = useState("");
   const [mensajeError, setMensajeError] = useState("");
+  const [imagen, setImagen] = useState<File | null>(null);
 
   const meses = [
     "Enero",
@@ -42,17 +43,17 @@ const Ingresos = () => {
     "Diciembre",
   ];
 
-  // Filtrar ingresos por el mes seleccionado
-  const ingresosDelMes = mesSeleccionado !== null
-    ? ingresos.filter((ingreso) => new Date(ingreso.fecha).getMonth() === mesSeleccionado)
-    : ingresos;
+  // Filtrar gastos por el mes seleccionado
+  const gastosDelMes = mesSeleccionado !== null
+    ? gastos.filter((gasto) => new Date(gasto.fecha).getMonth() === mesSeleccionado)
+    : gastos;
 
   // Datos para el gráfico de torta
   const dataPie = {
-    labels: ingresosDelMes.map((ingreso) => ingreso.descripcion),
+    labels: gastosDelMes.map((gasto) => gasto.descripcion),
     datasets: [
       {
-        data: ingresosDelMes.map((ingreso) => ingreso.monto),
+        data: gastosDelMes.map((gasto) => gasto.monto),
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -79,38 +80,55 @@ const Ingresos = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNuevoIngreso({ ...nuevoIngreso, [name]: value });
+    setNuevoGasto({ ...nuevoGasto, [name]: value });
   };
 
-  const handleAgregarIngreso = () => {
-    if (!nuevoIngreso.fecha || !nuevoIngreso.descripcion || !nuevoIngreso.monto) {
+  const handleAgregarGasto = () => {
+    if (!nuevoGasto.fecha || !nuevoGasto.descripcion || !nuevoGasto.monto) {
       setMensajeError("Favor completa todos los campos");
       return;
     }
 
-    setIngresos([
-      ...ingresos,
+    setGastos([
+      ...gastos,
       {
-        id: ingresos.length + 1,
-        fecha: nuevoIngreso.fecha,
-        descripcion: nuevoIngreso.descripcion,
-        monto: parseFloat(nuevoIngreso.monto),
+        id: gastos.length + 1,
+        fecha: nuevoGasto.fecha,
+        descripcion: nuevoGasto.descripcion,
+        monto: parseFloat(nuevoGasto.monto),
       },
     ]);
 
-    setNuevoIngreso({ fecha: "", descripcion: "", monto: "" });
+    setNuevoGasto({ fecha: "", descripcion: "", monto: "" });
     setMensajeError("");
     setMensajeExito("Se ha añadido con éxito");
     setTimeout(() => setMensajeExito(""), 3000);
   };
 
-  const handleEliminarIngreso = (id: number) => {
-    setIngresos(ingresos.filter((ingreso) => ingreso.id !== id));
+  const handleEliminarGasto = (id: number) => {
+    setGastos(gastos.filter((gasto) => gasto.id !== id));
+  };
+
+  const handleImagenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImagen(e.target.files[0]);
+
+      // Simulación de escaneo de datos desde la imagen
+      setTimeout(() => {
+        setNuevoGasto({
+          fecha: "2023-03-20", // Simulado
+          descripcion: "Boleta escaneada",
+          monto: "250",
+        });
+        setMensajeExito("Datos escaneados desde la imagen");
+        setTimeout(() => setMensajeExito(""), 3000);
+      }, 2000); // Simula un retraso en el escaneo
+    }
   };
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h1>Ingresos</h1>
+      <h1>Gastos</h1>
 
       {/* Franja de meses */}
       <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
@@ -145,11 +163,11 @@ const Ingresos = () => {
         </button>
       </div>
 
-      {/* Lista de ingresos */}
+      {/* Lista de gastos */}
       <ul style={{ listStyleType: "none", padding: 0 }}>
-        {ingresosDelMes.map((ingreso) => (
+        {gastosDelMes.map((gasto) => (
           <li
-            key={ingreso.id}
+            key={gasto.id}
             style={{
               border: "1px solid #ddd",
               borderRadius: "5px",
@@ -161,10 +179,10 @@ const Ingresos = () => {
             }}
           >
             <div>
-              <strong>{ingreso.fecha}</strong> - {ingreso.descripcion}: ${ingreso.monto}
+              <strong>{gasto.fecha}</strong> - {gasto.descripcion}: ${gasto.monto}
             </div>
             <button
-              onClick={() => handleEliminarIngreso(ingreso.id)}
+              onClick={() => handleEliminarGasto(gasto.id)}
               style={{
                 padding: "5px 10px",
                 backgroundColor: "#dc3545",
@@ -179,7 +197,7 @@ const Ingresos = () => {
           </li>
         ))}
       </ul>
-      {ingresosDelMes.length === 0 && <p>No hay ingresos para este mes.</p>}
+      {gastosDelMes.length === 0 && <p>No hay gastos para este mes.</p>}
 
       {/* Botón para mostrar/ocultar formulario */}
       <button
@@ -197,17 +215,17 @@ const Ingresos = () => {
         {mostrarFormulario ? "Cancelar" : "Añadir"}
       </button>
 
-      {/* Formulario para agregar ingresos */}
+      {/* Formulario para agregar gastos */}
       {mostrarFormulario && (
         <div style={{ marginTop: "20px" }}>
-          <h2>Añadir nuevo ingreso</h2>
+          <h2>Añadir nuevo gasto</h2>
           <div style={{ marginBottom: "10px" }}>
             <label>
               Fecha:
               <input
                 type="date"
                 name="fecha"
-                value={nuevoIngreso.fecha}
+                value={nuevoGasto.fecha}
                 onChange={handleInputChange}
                 style={{ marginLeft: "10px", padding: "5px" }}
               />
@@ -219,7 +237,7 @@ const Ingresos = () => {
               <input
                 type="text"
                 name="descripcion"
-                value={nuevoIngreso.descripcion}
+                value={nuevoGasto.descripcion}
                 onChange={handleInputChange}
                 placeholder="Descripción"
                 style={{ marginLeft: "10px", padding: "5px" }}
@@ -232,15 +250,26 @@ const Ingresos = () => {
               <input
                 type="number"
                 name="monto"
-                value={nuevoIngreso.monto}
+                value={nuevoGasto.monto}
                 onChange={handleInputChange}
                 placeholder="Monto"
                 style={{ marginLeft: "10px", padding: "5px" }}
               />
             </label>
           </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label>
+              Subir boleta:
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImagenChange}
+                style={{ marginLeft: "10px" }}
+              />
+            </label>
+          </div>
           <button
-            onClick={handleAgregarIngreso}
+            onClick={handleAgregarGasto}
             style={{
               padding: "10px 20px",
               backgroundColor: "#28a745",
@@ -259,9 +288,9 @@ const Ingresos = () => {
       {mensajeExito && <p style={{ color: "green", marginTop: "20px" }}>{mensajeExito}</p>}
 
       {/* Gráfico de torta */}
-      {mesSeleccionado !== null && ingresosDelMes.length > 0 && (
+      {mesSeleccionado !== null && gastosDelMes.length > 0 && (
         <div style={{ marginTop: "40px" }}>
-          <h2>Distribución de ingresos en {meses[mesSeleccionado]}</h2>
+          <h2>Distribución de gastos en {meses[mesSeleccionado]}</h2>
           <Pie data={dataPie} />
         </div>
       )}
@@ -269,4 +298,4 @@ const Ingresos = () => {
   );
 };
 
-export default Ingresos;
+export default Gastos;
