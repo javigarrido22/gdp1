@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [00:00:07.920] Server  LOG     ✓ Ready in 6.6s
 [00:00:14.114] Server  LOG     ○ Compiling / ...
 [00:00:22.812] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
@@ -44,3 +45,14 @@ You're importing a component that needs `useState`. This React Hook only works i
 [00:44:10.198] Server  LOG     ✓ Compiled in 396ms
 [00:44:13.871] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 [00:44:35.571] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+=======
+[00:00:02.740] Server  LOG     ✓ Ready in 1944ms
+[00:00:10.801] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:54.978] Server  LOG     ✓ Compiled in 47ms
+[01:38:16.358] Server  LOG     ✓ Compiled in 38ms
+[00:06:58.472] Server  LOG     ✓ Compiled in 53ms
+[01:38:21.546] Server  LOG     ✓ Compiled in 643ms
+[00:07:04.443] Server  LOG     ✓ Compiled in 1438ms
+[00:08:13.748] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:08:16.053] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+>>>>>>> fddb0ddbf269489a5818ca1e71716ef521afb000

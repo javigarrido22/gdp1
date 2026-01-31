@@ -1,7 +1,11 @@
 {
   "pages": {},
   "app": {
+<<<<<<< HEAD
     "[project]/app/_not-found/page": [
+=======
+    "[project]/gdp1/app/_not-found/page": [
+>>>>>>> fddb0ddbf269489a5818ca1e71716ef521afb000
       "static/media/caa3a2e1cccd8315-s.p.853070df.woff2",
       "static/media/797e433ab948586e-s.p.dbea232f.woff2"
     ]
