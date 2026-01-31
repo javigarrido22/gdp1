@@ -1,1 +1,1 @@
-export default function Home() { return ( <main> <h1>¡Ahora si que si Next.js!</h1> <p>Este es mi primer cambio en la página principal.</p> </main> ); }
+//export default function Home() { return ( <main> <h1>¡Ahora si que si Next.js!</h1> <p>Este es mi primer cambio en la página principal.</p> </main> ); }

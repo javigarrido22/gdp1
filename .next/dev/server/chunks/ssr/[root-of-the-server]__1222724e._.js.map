@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/javieramorales/Downloads/gdp1/app/page.tsx"],"sourcesContent":["export default function Home() { return ( <main> <h1>¡Ahora si que si Next.js!</h1> <p>Este es mi primer cambio en la página principal.</p> </main> ); }"],"names":[],"mappings":";;;;;;AAAe,SAAS;IAAS,qBAAS,8OAAC;;YAAK;0BAAC,8OAAC;0BAAG;;;;;;YAA8B;0BAAC,8OAAC;0BAAE;;;;;;YAAoD;;;;;;;AAAY"}}]
+}
