@@ -14,3 +14,10 @@ Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allow
 [00:10:21.687] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 [00:10:21.708] Server  LOG     ✓ Compiled in 114ms
 [00:10:22.999] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:17:39.210] Server  LOG     ✓ Compiled in 487ms
+[00:23:52.675] Server  LOG     ✓ Compiled in 94ms
+[00:24:52.997] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:28:23.174] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:29:39.526] Server  LOG     ✓ Compiled in 120ms
+[00:29:59.246] Browser ERROR   uncaughtError: Error: Error: Error attempting to read image.
+[00:29:59.246] Browser ERROR   Error al procesar la imagen: Error: Error attempting to read image.
