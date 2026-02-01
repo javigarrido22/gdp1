@@ -74,17 +74,11 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$chartjs$2d$2$2f$dist$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react-chartjs-2/dist/index.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/chart.js/dist/chart.js [app-ssr] (ecmascript) <locals>");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tesseract$2e$js$2f$src$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/tesseract.js/src/index.js [app-ssr] (ecmascript)"); // Importar Tesseract.js
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tesseract$2e$js$2f$src$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/tesseract.js/src/index.js [app-ssr] (ecmascript)"); // Importar Tesseract.js para OCR
 "use client";
 ;
 ;
 ;
-;
-;
-// Registrar los componentes de Chart.js
-__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Chart"].register(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["CategoryScale"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["LinearScale"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["BarElement"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Title"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Tooltip"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["Legend"], __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$chart$2e$js$2f$dist$2f$chart$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["ArcElement"]);
 const Egresos = ()=>{
     const [egresos, setEgresos] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([
         {
@@ -127,7 +121,7 @@ const Egresos = ()=>{
     const [mostrarFormulario, setMostrarFormulario] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [mensajeExito, setMensajeExito] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
     const [mensajeError, setMensajeError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("");
-    const [imagen, setImagen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [procesandoImagen, setProcesandoImagen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const meses = [
         "Enero",
         "Febrero",
@@ -142,33 +136,6 @@ const Egresos = ()=>{
         "Noviembre",
         "Diciembre"
     ];
-    // Filtrar egresos por el mes seleccionado
-    const egresosDelMes = mesSeleccionado !== null ? egresos.filter((egreso)=>new Date(egreso.fecha).getMonth() === mesSeleccionado) : egresos;
-    // Datos para el gráfico de torta
-    const dataPie = {
-        labels: egresosDelMes.map((egreso)=>egreso.descripcion),
-        datasets: [
-            {
-                data: egresosDelMes.map((egreso)=>egreso.monto),
-                backgroundColor: [
-                    "#FF6384",
-                    "#36A2EB",
-                    "#FFCE56",
-                    "#4BC0C0",
-                    "#9966FF",
-                    "#FF9F40"
-                ],
-                hoverBackgroundColor: [
-                    "#FF6384",
-                    "#36A2EB",
-                    "#FFCE56",
-                    "#4BC0C0",
-                    "#9966FF",
-                    "#FF9F40"
-                ]
-            }
-        ]
-    };
     const handleMesClick = (mes)=>{
         setMesSeleccionado(mes);
     };
@@ -202,25 +169,29 @@ const Egresos = ()=>{
         setMensajeExito("Se ha añadido con éxito");
         setTimeout(()=>setMensajeExito(""), 3000);
     };
-    const handleEliminarEgreso = (id)=>{
-        setEgresos(egresos.filter((egreso)=>egreso.id !== id));
-    };
-    const handleImagenChange = (e)=>{
+    const handleImagenChange = async (e)=>{
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            setImagen(file);
-            __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tesseract$2e$js$2f$src$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].recognize(file, "eng").then(({ data: { text } })=>{
-                // Procesar el texto extraído y llenar los campos
+            setProcesandoImagen(true); // Mostrar mensaje de procesamiento
+            try {
+                const result = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$tesseract$2e$js$2f$src$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].recognize(file, "eng"); // Procesar la imagen con OCR
+                const text = result.data.text;
+                // Extraer datos del texto (esto es un ejemplo, ajusta según el formato de tus boletas)
+                const fechaMatch = text.match(/\d{4}-\d{2}-\d{2}/); // Buscar fecha en formato YYYY-MM-DD
+                const montoMatch = text.match(/\d+(\.\d{1,2})?/); // Buscar monto (número con decimales)
+                const descripcion = "Boleta escaneada"; // Puedes ajustar esto según el texto extraído
                 setNuevoEgreso({
-                    fecha: "2023-03-20",
-                    descripcion: "Descripción extraída",
-                    monto: "250"
+                    fecha: fechaMatch ? fechaMatch[0] : "",
+                    descripcion,
+                    monto: montoMatch ? montoMatch[0] : ""
                 });
-                setMensajeExito("Datos escaneados desde la imagen");
-            }).catch((err)=>{
-                console.error("Error al procesar la imagen:", err);
+                setMensajeExito("Datos escaneados desde la boleta");
+            } catch (error) {
+                console.error("Error al procesar la imagen:", error);
                 setMensajeError("No se pudo procesar la boleta");
-            });
+            } finally{
+                setProcesandoImagen(false); // Ocultar mensaje de procesamiento
+            }
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -239,7 +210,7 @@ const Egresos = ()=>{
                 children: "Egresos"
             }, void 0, false, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 139,
+                lineNumber: 105,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -262,7 +233,7 @@ const Egresos = ()=>{
                             children: mes
                         }, index, false, {
                             fileName: "[project]/app/egresos/page.tsx",
-                            lineNumber: 144,
+                            lineNumber: 110,
                             columnNumber: 11
                         }, ("TURBOPACK compile-time value", void 0))),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -278,13 +249,13 @@ const Egresos = ()=>{
                         children: "Todos"
                     }, void 0, false, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 159,
+                        lineNumber: 125,
                         columnNumber: 9
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 142,
+                lineNumber: 108,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -292,7 +263,7 @@ const Egresos = ()=>{
                     listStyleType: "none",
                     padding: 0
                 },
-                children: egresosDelMes.map((egreso)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                children: egresos.filter((egreso)=>mesSeleccionado !== null ? new Date(egreso.fecha).getMonth() === mesSeleccionado : true).map((egreso)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                         style: {
                             border: "1px solid #ddd",
                             borderRadius: "5px",
@@ -309,8 +280,8 @@ const Egresos = ()=>{
                                         children: egreso.fecha
                                     }, void 0, false, {
                                         fileName: "[project]/app/egresos/page.tsx",
-                                        lineNumber: 190,
-                                        columnNumber: 15
+                                        lineNumber: 162,
+                                        columnNumber: 17
                                     }, ("TURBOPACK compile-time value", void 0)),
                                     " - ",
                                     egreso.descripcion,
@@ -319,11 +290,11 @@ const Egresos = ()=>{
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 189,
-                                columnNumber: 13
+                                lineNumber: 161,
+                                columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                onClick: ()=>handleEliminarEgreso(egreso.id),
+                                onClick: ()=>setEgresos(egresos.filter((e)=>e.id !== egreso.id)),
                                 style: {
                                     padding: "5px 10px",
                                     backgroundColor: "#dc3545",
@@ -335,26 +306,26 @@ const Egresos = ()=>{
                                 children: "Eliminar"
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 192,
-                                columnNumber: 13
+                                lineNumber: 164,
+                                columnNumber: 15
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, egreso.id, true, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 177,
-                        columnNumber: 11
+                        lineNumber: 149,
+                        columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)))
             }, void 0, false, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 175,
+                lineNumber: 141,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
-            egresosDelMes.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            egresos.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 children: "No hay egresos para este mes."
             }, void 0, false, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 208,
-                columnNumber: 38
+                lineNumber: 180,
+                columnNumber: 32
             }, ("TURBOPACK compile-time value", void 0)),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 onClick: ()=>setMostrarFormulario(!mostrarFormulario),
@@ -370,7 +341,7 @@ const Egresos = ()=>{
                 children: mostrarFormulario ? "Cancelar" : "Añadir"
             }, void 0, false, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 211,
+                lineNumber: 183,
                 columnNumber: 7
             }, ("TURBOPACK compile-time value", void 0)),
             mostrarFormulario && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -391,7 +362,7 @@ const Egresos = ()=>{
                         children: "Añadir nuevo egreso"
                     }, void 0, false, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 229,
+                        lineNumber: 201,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -409,7 +380,7 @@ const Egresos = ()=>{
                                 children: "Fecha:"
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 232,
+                                lineNumber: 204,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -426,13 +397,13 @@ const Egresos = ()=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 235,
+                                lineNumber: 207,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 231,
+                        lineNumber: 203,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -450,7 +421,7 @@ const Egresos = ()=>{
                                 children: "Descripción:"
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 251,
+                                lineNumber: 223,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -468,13 +439,13 @@ const Egresos = ()=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 254,
+                                lineNumber: 226,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 250,
+                        lineNumber: 222,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -492,7 +463,7 @@ const Egresos = ()=>{
                                 children: "Monto:"
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 271,
+                                lineNumber: 243,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -510,13 +481,13 @@ const Egresos = ()=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 274,
+                                lineNumber: 246,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 270,
+                        lineNumber: 242,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -534,12 +505,12 @@ const Egresos = ()=>{
                                 children: "Subir boleta:"
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 291,
+                                lineNumber: 263,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                 type: "file",
-                                accept: "image/*",
+                                accept: "image/*,application/pdf",
                                 onChange: handleImagenChange,
                                 style: {
                                     width: "100%",
@@ -550,14 +521,27 @@ const Egresos = ()=>{
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/app/egresos/page.tsx",
-                                lineNumber: 294,
+                                lineNumber: 266,
                                 columnNumber: 13
                             }, ("TURBOPACK compile-time value", void 0))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 290,
+                        lineNumber: 262,
                         columnNumber: 11
+                    }, ("TURBOPACK compile-time value", void 0)),
+                    procesandoImagen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        style: {
+                            color: "blue",
+                            marginTop: "15px",
+                            fontWeight: "bold",
+                            textAlign: "center"
+                        },
+                        children: "Procesando imagen, por favor espera..."
+                    }, void 0, false, {
+                        fileName: "[project]/app/egresos/page.tsx",
+                        lineNumber: 281,
+                        columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0)),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: handleAgregarEgreso,
@@ -573,12 +557,10 @@ const Egresos = ()=>{
                             cursor: "pointer",
                             transition: "background-color 0.3s ease"
                         },
-                        onMouseOver: (e)=>e.currentTarget.style.backgroundColor = "#218838",
-                        onMouseOut: (e)=>e.currentTarget.style.backgroundColor = "#28a745",
                         children: "Agregar"
                     }, void 0, false, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 308,
+                        lineNumber: 286,
                         columnNumber: 11
                     }, ("TURBOPACK compile-time value", void 0)),
                     mensajeError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -591,13 +573,13 @@ const Egresos = ()=>{
                         children: mensajeError
                     }, void 0, false, {
                         fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 329,
+                        lineNumber: 305,
                         columnNumber: 13
                     }, ("TURBOPACK compile-time value", void 0))
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 228,
+                lineNumber: 200,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0)),
             mensajeExito && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -610,45 +592,13 @@ const Egresos = ()=>{
                 children: mensajeExito
             }, void 0, false, {
                 fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 337,
-                columnNumber: 9
-            }, ("TURBOPACK compile-time value", void 0)),
-            mesSeleccionado !== null && egresosDelMes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                style: {
-                    marginTop: "40px"
-                },
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                        style: {
-                            textAlign: "center",
-                            color: "#333"
-                        },
-                        children: [
-                            "Distribución de egresos en ",
-                            meses[mesSeleccionado]
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 345,
-                        columnNumber: 11
-                    }, ("TURBOPACK compile-time value", void 0)),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$chartjs$2d$2$2f$dist$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Pie"], {
-                        data: dataPie
-                    }, void 0, false, {
-                        fileName: "[project]/app/egresos/page.tsx",
-                        lineNumber: 346,
-                        columnNumber: 11
-                    }, ("TURBOPACK compile-time value", void 0))
-                ]
-            }, void 0, true, {
-                fileName: "[project]/app/egresos/page.tsx",
-                lineNumber: 344,
+                lineNumber: 313,
                 columnNumber: 9
             }, ("TURBOPACK compile-time value", void 0))
         ]
     }, void 0, true, {
         fileName: "[project]/app/egresos/page.tsx",
-        lineNumber: 138,
+        lineNumber: 104,
         columnNumber: 5
     }, ("TURBOPACK compile-time value", void 0));
 };

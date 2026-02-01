@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
-import Tesseract from "tesseract.js"; // Importar Tesseract.js
-
-// Registrar los componentes de Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
-
+import Tesseract from "tesseract.js"; // Importar Tesseract.js para OCR
 
 const Egresos = () => {
   const [egresos, setEgresos] = useState([
@@ -24,12 +18,11 @@ const Egresos = () => {
     monto: "",
   });
 
-
   const [mesSeleccionado, setMesSeleccionado] = useState<number | null>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mensajeExito, setMensajeExito] = useState("");
   const [mensajeError, setMensajeError] = useState("");
-  const [imagen, setImagen] = useState<File | null>(null);
+  const [procesandoImagen, setProcesandoImagen] = useState(false);
 
   const meses = [
     "Enero",
@@ -45,37 +38,6 @@ const Egresos = () => {
     "Noviembre",
     "Diciembre",
   ];
-
-  // Filtrar egresos por el mes seleccionado
-  const egresosDelMes = mesSeleccionado !== null
-    ? egresos.filter((egreso) => new Date(egreso.fecha).getMonth() === mesSeleccionado)
-    : egresos;
-
-  // Datos para el gráfico de torta
-  const dataPie = {
-    labels: egresosDelMes.map((egreso) => egreso.descripcion),
-    datasets: [
-      {
-        data: egresosDelMes.map((egreso) => egreso.monto),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-      },
-    ],
-  };
 
   const handleMesClick = (mes: number) => {
     setMesSeleccionado(mes);
@@ -108,29 +70,33 @@ const Egresos = () => {
     setTimeout(() => setMensajeExito(""), 3000);
   };
 
-  const handleEliminarEgreso = (id: number) => {
-    setEgresos(egresos.filter((egreso) => egreso.id !== id));
-  };
-
-  const handleImagenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImagenChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setImagen(file);
+      setProcesandoImagen(true); // Mostrar mensaje de procesamiento
 
-      Tesseract.recognize(file, "eng")
-        .then(({ data: { text } }) => {
-          // Procesar el texto extraído y llenar los campos
-          setNuevoEgreso({
-            fecha: "2023-03-20", // Extraer fecha del texto si es posible
-            descripcion: "Descripción extraída", // Extraer descripción del texto
-            monto: "250", // Extraer monto del texto
-          });
-          setMensajeExito("Datos escaneados desde la imagen");
-        })
-        .catch((err) => {
-          console.error("Error al procesar la imagen:", err);
-          setMensajeError("No se pudo procesar la boleta");
+      try {
+        const result = await Tesseract.recognize(file, "eng"); // Procesar la imagen con OCR
+        const text = result.data.text;
+
+        // Extraer datos del texto (esto es un ejemplo, ajusta según el formato de tus boletas)
+        const fechaMatch = text.match(/\d{4}-\d{2}-\d{2}/); // Buscar fecha en formato YYYY-MM-DD
+        const montoMatch = text.match(/\d+(\.\d{1,2})?/); // Buscar monto (número con decimales)
+        const descripcion = "Boleta escaneada"; // Puedes ajustar esto según el texto extraído
+
+        setNuevoEgreso({
+          fecha: fechaMatch ? fechaMatch[0] : "",
+          descripcion,
+          monto: montoMatch ? montoMatch[0] : "",
         });
+
+        setMensajeExito("Datos escaneados desde la boleta");
+      } catch (error) {
+        console.error("Error al procesar la imagen:", error);
+        setMensajeError("No se pudo procesar la boleta");
+      } finally {
+        setProcesandoImagen(false); // Ocultar mensaje de procesamiento
+      }
     }
   };
 
@@ -173,39 +139,45 @@ const Egresos = () => {
 
       {/* Lista de egresos */}
       <ul style={{ listStyleType: "none", padding: 0 }}>
-        {egresosDelMes.map((egreso) => (
-          <li
-            key={egreso.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              padding: "10px",
-              marginBottom: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <strong>{egreso.fecha}</strong> - {egreso.descripcion}: ${egreso.monto}
-            </div>
-            <button
-              onClick={() => handleEliminarEgreso(egreso.id)}
+        {egresos
+          .filter((egreso) =>
+            mesSeleccionado !== null
+              ? new Date(egreso.fecha).getMonth() === mesSeleccionado
+              : true
+          )
+          .map((egreso) => (
+            <li
+              key={egreso.id}
               style={{
-                padding: "5px 10px",
-                backgroundColor: "#dc3545",
-                color: "#fff",
-                border: "none",
+                border: "1px solid #ddd",
                 borderRadius: "5px",
-                cursor: "pointer",
+                padding: "10px",
+                marginBottom: "10px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Eliminar
-            </button>
-          </li>
-        ))}
+              <div>
+                <strong>{egreso.fecha}</strong> - {egreso.descripcion}: ${egreso.monto}
+              </div>
+              <button
+                onClick={() => setEgresos(egresos.filter((e) => e.id !== egreso.id))}
+                style={{
+                  padding: "5px 10px",
+                  backgroundColor: "#dc3545",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Eliminar
+              </button>
+            </li>
+          ))}
       </ul>
-      {egresosDelMes.length === 0 && <p>No hay egresos para este mes.</p>}
+      {egresos.length === 0 && <p>No hay egresos para este mes.</p>}
 
       {/* Botón para mostrar/ocultar formulario */}
       <button
@@ -293,7 +265,7 @@ const Egresos = () => {
             </label>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,application/pdf" // Permitir solo archivos de imagen y pdf
               onChange={handleImagenChange}
               style={{
                 width: "100%",
@@ -304,6 +276,12 @@ const Egresos = () => {
               }}
             />
           </div>
+
+          {procesandoImagen && (
+            <p style={{ color: "blue", marginTop: "15px", fontWeight: "bold", textAlign: "center" }}>
+              Procesando imagen, por favor espera...
+            </p>
+          )}
 
           <button
             onClick={handleAgregarEgreso}
@@ -319,8 +297,6 @@ const Egresos = () => {
               cursor: "pointer",
               transition: "background-color 0.3s ease",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#218838")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#28a745")}
           >
             Agregar
           </button>
@@ -337,14 +313,6 @@ const Egresos = () => {
         <p style={{ color: "green", marginTop: "20px", fontWeight: "bold", textAlign: "center" }}>
           {mensajeExito}
         </p>
-      )}
-
-      {/* Gráfico de torta */}
-      {mesSeleccionado !== null && egresosDelMes.length > 0 && (
-        <div style={{ marginTop: "40px" }}>
-          <h2 style={{ textAlign: "center", color: "#333" }}>Distribución de egresos en {meses[mesSeleccionado]}</h2>
-          <Pie data={dataPie} />
-        </div>
       )}
     </div>
   );

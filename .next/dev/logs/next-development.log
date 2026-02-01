@@ -1,16 +1,64 @@
-[00:00:03.760] Server  LOG     ✓ Ready in 2.8s
-[00:00:09.472] Server  WARN    ⚠ Cross origin request detected from 192.168.1.2 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
-[00:00:09.544] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:04:17.762] Server  LOG     ✓ Compiled in 9ms
-[00:04:30.846] Server  LOG     ✓ Compiled in 205ms
-[00:05:12.396] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:07:42.553] Server  LOG     ✓ Compiled in 23ms
-[00:09:03.555] Server  LOG     ✓ Compiled in 119ms
-[00:09:04.576] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:09:06.010] Browser ERROR   uncaughtError: ReferenceError: Link is not defined
-[00:10:21.686] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:10:21.686] Server  WARN    ⚠ Fast Refresh had to perform a full reload when ./app/egresos/page.tsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
-[00:10:21.687] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
-[00:10:21.708] Server  LOG     ✓ Compiled in 114ms
-[00:10:22.999] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:03.455] Server  LOG     ✓ Ready in 2.4s
+[00:00:07.787] Server  LOG     ○ Compiling / ...
+[00:00:19.505] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:06:29.077] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:08:40.272] Server  LOG     ✓ Compiled in 63ms
+[00:08:40.511] Browser ERROR   uncaughtError: ReferenceError: Link is not defined
+[00:09:46.938] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:09:46.996] Server  LOG     ✓ Compiled in 108ms
+[00:09:47.942] Server  ERROR   ⨯ ReferenceError: Link is not defined
+[00:09:48.061] Browser ERROR   uncaughtError: ReferenceError: Link is not defined
+[00:09:48.748] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:09:48.965] Browser ERROR   uncaughtError: ReferenceError: Link is not defined
+[00:10:44.695] Server  LOG     ✓ Compiled in 643ms
+[00:10:44.703] Server  WARN    ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[00:10:45.737] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:59.910] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:26.919] Server  LOG     ✓ Compiled in 102ms
+[00:14:11.519] Server  LOG     ✓ Compiled in 105ms
+[00:23:25.792] Server  LOG     ✓ Compiled in 144ms
+[00:23:26.343] Browser ERROR   ./app/page.tsx:26:12
+Parsing ecmascript source code failed
+  24 |   return (
+  25 |     <></>
+> 26 |       <div className="App"></div>
+     |            ^^^^^^^^^
+  27 |         <h1>📈 Dashboard Financiero</h1>
+  28 |
+  29 |         {/* Enlaces a otras páginas */}
+
+Expected ',', got 'ident'
+
+Import traces:
+  Client Component Browser:
+    ./app/page.tsx [Client Component Browser]
+    ./app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/page.tsx [Client Component SSR]
+    ./app/page.tsx [Server Component]
+[00:24:12.041] Server  LOG     ✓ Compiled in 253ms
+[00:25:05.850] Server  LOG     ✓ Compiled in 121ms
+[00:26:56.179] Server  LOG     ✓ Compiled in 108ms
+[00:28:30.922] Server  LOG     ✓ Compiled in 78ms
+[00:30:09.141] Server  LOG     ✓ Compiled in 74ms
+[00:30:09.649] Browser ERROR   ./app/page.tsx:112:7
+Parsing ecmascript source code failed
+  110 |         </form>
+  111 |       </div>
+> 112 |     </>
+      |       ^
+  113 |   );
+  114 | }
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./app/page.tsx [Client Component Browser]
+    ./app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./app/page.tsx [Client Component SSR]
+    ./app/page.tsx [Server Component]
+[00:31:58.643] Server  LOG     ✓ Compiled in 53ms
