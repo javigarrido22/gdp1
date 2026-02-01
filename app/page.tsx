@@ -14,7 +14,7 @@ export default function Home() {
     <div className="App">
       <h1>📈 Dashboard Financiero</h1>
       
-      <Link href="/ingresos" style={{ 
+<Link href="/ingresos" style={{ 
         display: "inline-block", 
         marginBottom: "1rem",
         marginRight: "1rem", /* Espacio hacia la derecha */

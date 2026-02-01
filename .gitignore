@@ -1,2 +1,8 @@
 node_modules/
+<<<<<<< HEAD
 .next/
+=======
+.next/
+.DS_Store
+*.log
+>>>>>>> origin/jp_gdp1
