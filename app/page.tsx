@@ -36,28 +36,58 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="login-box">
-        <h2>Bienvenido a Ordenate</h2>
-        <form onSubmit={manejarEnvio}>
-          <div className="form-group">
-            <label>Usuario:</label>
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={usuario}
-              onChange={(e) => setUsuario(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Contraseña:</label>
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
-            />
-          </div>
-        </form>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        marginTop: '50px' 
+      }}>
+        <div className="login-box" style={{
+          textAlign: 'center',
+          padding: '30px',
+          backgroundColor: 'white',
+          borderRadius: '10px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          <h2 style={{ color: 'black', fontSize: '36px', fontFamily: 'Verdana, sans-serif', fontWeight: 'bold' }}>Bienvenido a Ordenate</h2>
+          <form onSubmit={manejarEnvio}>
+            <div className="form-group">
+              <label style={{ color: 'black' }}>Usuario:</label>
+              <input
+                type="text"
+                placeholder="Usuario"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                style={{ color: 'black' }}
+              />
+            </div>
+            <div className="form-group">
+              <label style={{ color: 'black' }}>Contraseña:</label>
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={contraseña}
+                onChange={(e) => setContraseña(e.target.value)}
+                style={{ color: 'black' }}
+              />
+            </div>
+            <button 
+              type="submit" 
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                marginTop: '10px'
+              }}
+            >
+              Acceder
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
