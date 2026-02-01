@@ -1,5 +1,7 @@
+"use client";
+
+import { useState } from "react";
 import "./styles.css";
-import Link from "next/link";
 
 const datosFinancieros = [
   { id: 1, nombre: "Apple (AAPL)", precio: 185.32, cambio: "+1.2%" },
@@ -10,22 +12,18 @@ const datosFinancieros = [
 ];
 
 export default function Home() {
+  const [usuario, setUsuario] = useState("");
+  const [contraseña, setContraseña] = useState("");
+
+  const manejarEnvio = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Usuario:", usuario, "Contraseña:", contraseña);
+  };
+
   return (
     <div className="App">
       <h1>📈 Dashboard Financiero</h1>
-      
-      <Link href="/ingresos" style={{ 
-        display: "inline-block", 
-        marginBottom: "1rem",
-        padding: "0.5rem 1rem",
-        backgroundColor: "#4caf50",
-        color: "white",
-        textDecoration: "none",
-        borderRadius: "4px"
-      }}>
-        Ver Ingresos →
-      </Link>
-      
+
       <div className="carrusel">
         {datosFinancieros.map((item) => (
           <div key={item.id} className="card">
@@ -37,6 +35,32 @@ export default function Home() {
           </div>
         ))}
       </div>
+
+      <div className="login-box">
+        <h2>Bienvenido a Ordenate</h2>
+        <form onSubmit={manejarEnvio}>
+          <div className="form-group">
+            <label>Usuario:</label>
+            <input
+              type="text"
+              placeholder="Usuario"
+              value={usuario}
+              onChange={(e) => setUsuario(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label>Contraseña:</label>
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={contraseña}
+              onChange={(e) => setContraseña(e.target.value)}
+            />
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
+
+

@@ -255,10 +255,6 @@
 @layer components;
 
 @layer utilities {
-  .inline-block {
-    display: inline-block;
-  }
-
   .antialiased {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
