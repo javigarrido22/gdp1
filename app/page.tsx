@@ -103,7 +103,7 @@ export default function LoginPage() {
             opacity: 0.9,
             maxWidth: "400px",
             lineHeight: "1.6",
-            textAlign:"center"
+            margin: "0 auto"
           }}>
             Gestiona tus finanzas de manera inteligente y alcanza tus metas financieras
           </p>
@@ -126,16 +126,6 @@ export default function LoginPage() {
           padding: "3rem",
           boxShadow: "0 10px 40px rgba(0,0,0,0.1)"
         }}>
-          {/* Logo */}
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <Image 
-              src="/ordenateya.png" 
-              alt="OrdenateYA Logo" 
-              width={200} 
-              height={200}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
 
           <h2 style={{
             textAlign: "center",
@@ -264,8 +254,8 @@ export default function LoginPage() {
                 transition: "background-color 0.3s",
                 marginBottom: "1rem"
               }}
-              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#5568d3")}
-              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#667eea")}
+              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#04474B")}
+              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#096266")}
             >
               {cargando ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
@@ -278,9 +268,9 @@ export default function LoginPage() {
             margin: "1.5rem 0",
             gap: "1rem"
           }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#096266" }}></div>
             <span style={{ color: "#999", fontSize: "0.9rem" }}>o</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#096266" }}></div>
           </div>
 
           {/* Enlace a registro */}
