@@ -14,9 +14,24 @@ interface Usuario {
   telefono: string;
 }
 
+interface Resumen {
+  totalIngresos: number;
+  totalEgresos: number;
+  balance: number;
+  cantidadIngresos: number;
+  cantidadEgresos: number;
+}
+
 export default function DashboardPage() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [menuUsuarioAbierto, setMenuUsuarioAbierto] = useState(false);
+  const [resumen, setResumen] = useState<Resumen>({
+    totalIngresos: 0,
+    totalEgresos: 0,
+    balance: 0,
+    cantidadIngresos: 0,
+    cantidadEgresos: 0
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -27,8 +42,24 @@ export default function DashboardPage() {
       return;
     }
 
-    setUsuario(JSON.parse(usuarioGuardado));
+    const usuarioData = JSON.parse(usuarioGuardado);
+    setUsuario(usuarioData);
+    
+    // Aquí puedes cargar el resumen real desde tu API
+    cargarResumen(usuarioData.id);
   }, [router]);
+
+  const cargarResumen = async (usuarioId: number) => {
+    try {
+      const response = await fetch(`/api/resumen?usuarioId=${usuarioId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setResumen(data);
+      }
+    } catch (error) {
+      console.error('Error al cargar resumen:', error);
+    }
+  };
 
   const cerrarSesion = () => {
     localStorage.removeItem('usuario');
@@ -39,6 +70,15 @@ export default function DashboardPage() {
     const inicial1 = nombres.charAt(0).toUpperCase();
     const inicial2 = apellidos.charAt(0).toUpperCase();
     return `${inicial1}${inicial2}`;
+  };
+
+  const formatearMonto = (monto: number) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(monto);
   };
 
   if (!usuario) {
@@ -102,7 +142,6 @@ export default function DashboardPage() {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#e8e8e8"}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
             >
-              {/* Avatar con iniciales */}
               <div style={{
                 width: "40px",
                 height: "40px",
@@ -127,7 +166,6 @@ export default function DashboardPage() {
                 </p>
               </div>
 
-              {/* Icono flecha */}
               <svg 
                 width="16" 
                 height="16" 
@@ -142,7 +180,6 @@ export default function DashboardPage() {
               </svg>
             </button>
 
-            {/* Menú desplegable */}
             {menuUsuarioAbierto && (
               <div style={{
                 position: "absolute",
@@ -155,7 +192,6 @@ export default function DashboardPage() {
                 zIndex: 1000,
                 overflow: "hidden"
               }}>
-                {/* Información del usuario */}
                 <div style={{
                   padding: "1rem",
                   borderBottom: "1px solid #e0e0e0",
@@ -185,7 +221,6 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                {/* Opciones del menú */}
                 <div style={{ padding: "0.5rem 0" }}>
                   <button
                     onClick={() => {
@@ -378,16 +413,25 @@ export default function DashboardPage() {
                 Egresos
               </h2>
               <p style={{ 
+                color: "#f44336", 
+                margin: "0.5rem 0",
+                textAlign: "center",
+                fontSize: "1.3rem",
+                fontWeight: "700"
+              }}>
+                {formatearMonto(resumen.totalEgresos)}
+              </p>
+              <p style={{ 
                 color: "#666", 
                 margin: 0,
                 textAlign: "center",
-                fontSize: "0.95rem"
+                fontSize: "0.85rem"
               }}>
-                Controla y analiza tus gastos diarios
+                {resumen.cantidadEgresos} registro{resumen.cantidadEgresos !== 1 ? 's' : ''}
               </p>
             </Link>
 
-            {/* Tarjeta Resumen */}
+            {/* Tarjeta Balance */}
             <div
               style={{
                 backgroundColor: "white",
@@ -406,7 +450,7 @@ export default function DashboardPage() {
                 fontSize: "1.5rem",
                 textAlign: "center"
               }}>
-                Resumen Financiero
+                Balance
               </h2>
               <div style={{ marginTop: "1.5rem" }}>
                 <div style={{ 
@@ -417,8 +461,10 @@ export default function DashboardPage() {
                   backgroundColor: "#e8f5e9",
                   borderRadius: "4px"
                 }}>
-                  <span style={{ color: "#2e7d32", fontWeight: "500" }}>Total Ingresos:</span>
-                  <span style={{ color: "#2e7d32", fontWeight: "600" }}>$0</span>
+                  <span style={{ color: "#2e7d32", fontWeight: "500", fontSize: "0.9rem" }}>Ingresos:</span>
+                  <span style={{ color: "#2e7d32", fontWeight: "600", fontSize: "0.9rem" }}>
+                    {formatearMonto(resumen.totalIngresos)}
+                  </span>
                 </div>
                 <div style={{ 
                   display: "flex", 
@@ -428,23 +474,127 @@ export default function DashboardPage() {
                   backgroundColor: "#ffebee",
                   borderRadius: "4px"
                 }}>
-                  <span style={{ color: "#c62828", fontWeight: "500" }}>Total Egresos:</span>
-                  <span style={{ color: "#c62828", fontWeight: "600" }}>$0</span>
+                  <span style={{ color: "#c62828", fontWeight: "500", fontSize: "0.9rem" }}>Egresos:</span>
+                  <span style={{ color: "#c62828", fontWeight: "600", fontSize: "0.9rem" }}>
+                    {formatearMonto(resumen.totalEgresos)}
+                  </span>
                 </div>
                 <div style={{ 
                   display: "flex", 
                   justifyContent: "space-between",
                   padding: "0.75rem",
-                  backgroundColor: "#e3f2fd",
+                  backgroundColor: resumen.balance >= 0 ? "#e3f2fd" : "#ffebee",
                   borderRadius: "4px",
                   marginTop: "1rem",
-                  borderTop: "2px solid #3498db"
+                  borderTop: `2px solid ${resumen.balance >= 0 ? "#3498db" : "#f44336"}`
                 }}>
-                  <span style={{ color: "#1565c0", fontWeight: "600", fontSize: "1.1rem" }}>Balance:</span>
-                  <span style={{ color: "#1565c0", fontWeight: "700", fontSize: "1.1rem" }}>$0</span>
+                  <span style={{ 
+                    color: resumen.balance >= 0 ? "#1565c0" : "#c62828", 
+                    fontWeight: "600", 
+                    fontSize: "1.1rem" 
+                  }}>
+                    Total:
+                  </span>
+                  <span style={{ 
+                    color: resumen.balance >= 0 ? "#1565c0" : "#c62828", 
+                    fontWeight: "700", 
+                    fontSize: "1.1rem" 
+                  }}>
+                    {formatearMonto(resumen.balance)}
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Tarjeta Estadísticas */}
+            <Link
+              href="/estadisticas"
+              style={{
+                textDecoration: "none",
+                backgroundColor: "white",
+                borderRadius: "8px",
+                padding: "2rem",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                cursor: "pointer",
+                border: "2px solid transparent"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(156, 39, 176, 0.3)";
+                e.currentTarget.style.borderColor = "#9c27b0";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+                e.currentTarget.style.borderColor = "transparent";
+              }}
+            >
+              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
+                📊
+              </div>
+              <h2 style={{ 
+                color: "#9c27b0", 
+                margin: "0 0 0.5rem 0",
+                fontSize: "1.5rem",
+                textAlign: "center"
+              }}>
+                Estadísticas
+              </h2>
+              <p style={{ 
+                color: "#666", 
+                margin: 0,
+                textAlign: "center",
+                fontSize: "0.95rem"
+              }}>
+                Visualiza tus datos financieros
+              </p>
+            </Link>
+
+            {/* Tarjeta Metas */}
+            <Link
+              href="/metas"
+              style={{
+                textDecoration: "none",
+                backgroundColor: "white",
+                borderRadius: "8px",
+                padding: "2rem",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                cursor: "pointer",
+                border: "2px solid transparent"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(255, 152, 0, 0.3)";
+                e.currentTarget.style.borderColor = "#ff9800";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+                e.currentTarget.style.borderColor = "transparent";
+              }}
+            >
+              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
+                🎯
+              </div>
+              <h2 style={{ 
+                color: "#ff9800", 
+                margin: "0 0 0.5rem 0",
+                fontSize: "1.5rem",
+                textAlign: "center"
+              }}>
+                Metas
+              </h2>
+              <p style={{ 
+                color: "#666", 
+                margin: 0,
+                textAlign: "center",
+                fontSize: "0.95rem"
+              }}>
+                Define y alcanza tus objetivos
+              </p>
+            </Link>
           </div>
 
           {/* Acceso rápido */}
@@ -492,6 +642,24 @@ export default function DashboardPage() {
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f44336"}
               >
                 ➖ Agregar Egreso
+              </Link>
+
+              <Link
+                href="/metas"
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  backgroundColor: "#ff9800",
+                  color: "white",
+                  textDecoration: "none",
+                  borderRadius: "5px",
+                  fontWeight: "500",
+                  fontSize: "0.95rem",
+                  transition: "background-color 0.2s"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f57c00"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#ff9800"}
+              >
+                🎯 Nueva Meta
               </Link>
             </div>
           </div>
