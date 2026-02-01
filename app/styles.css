@@ -1,1 +1,41 @@
-.App { background-color: #141414; color: white; padding: 20px; font-family: Arial, sans-serif; } h1 { margin-bottom: 20px; } .carrusel { display: flex; gap: 15px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 10px; } .card { min-width: 220px; background-color: #222; border-radius: 8px; padding: 15px; text-align: center; transition: transform 0.3s; } .card:hover { transform: scale(1.05); cursor: pointer; } .positivo { color: #4caf50; /* verde */ } .negativo { color: #f44336; /* rojo */ }
+.App { 
+    background-color: #89CFF0; 
+    color: white; 
+    padding: 20px; 
+    font-family: Arial, sans-serif; 
+} 
+
+h1 { 
+    margin-bottom: 20px; 
+} 
+
+.carrusel { 
+    display: flex; 
+    gap: 15px; 
+    overflow-x: auto; 
+    scroll-behavior: 
+    smooth; padding-bottom: 10px; 
+    text-align: center;
+} 
+
+.card { 
+    min-width: 220px; 
+    background-color: #04474b; 
+    border-radius: 8px; 
+    padding: 15px; 
+    text-align: center; 
+    transition: transform 0.3s; 
+} 
+
+.card:hover { 
+    transform: scale(1.05); 
+    cursor: pointer; 
+} 
+
+.positivo { 
+    color: #4caf50; /* verde */ 
+} 
+
+.negativo { 
+    color: #f44336; /* rojo */ 
+}
