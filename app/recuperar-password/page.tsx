@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import React from "react";
 
 export default function RecuperarPasswordPage() {
   const [paso, setPaso] = useState(1); // 1: datos, 2: código, 3: nueva contraseña
@@ -139,7 +140,7 @@ export default function RecuperarPasswordPage() {
       {/* Panel izquierdo */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -184,7 +185,9 @@ export default function RecuperarPasswordPage() {
             fontSize: "1.2rem", 
             opacity: 0.9,
             maxWidth: "400px",
-            lineHeight: "1.6"
+            lineHeight: "1.6",
+            textAlign: "center",
+            margin: "0 auto"
           }}>
             {paso === 1 && "Te enviaremos un código de verificación a tu correo"}
             {paso === 2 && "Ingresa el código de 6 dígitos que enviamos"}
@@ -229,12 +232,12 @@ export default function RecuperarPasswordPage() {
             alignItems: "center"
           }}>
             {[1, 2, 3].map((num) => (
-              <>
-                <div key={num} style={{
+              <React.Fragment key={num}>
+                <div style={{
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
-                  backgroundColor: paso >= num ? "#667eea" : "#e0e0e0",
+                  backgroundColor: paso >= num ? "#096266" : "#e0e0e0",
                   color: "white",
                   display: "flex",
                   alignItems: "center",
@@ -253,7 +256,7 @@ export default function RecuperarPasswordPage() {
                     transition: "all 0.3s"
                   }}></div>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </div>
 
@@ -358,7 +361,7 @@ export default function RecuperarPasswordPage() {
                 style={{
                   width: "100%",
                   padding: "1rem",
-                  backgroundColor: cargando ? "#ccc" : "#667eea",
+                  backgroundColor: cargando ? "#ccc" : "#096266",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
@@ -447,7 +450,7 @@ export default function RecuperarPasswordPage() {
                   style={{
                     flex: 2,
                     padding: "1rem",
-                    backgroundColor: "#667eea",
+                    backgroundColor: "#096266",
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
@@ -554,7 +557,7 @@ export default function RecuperarPasswordPage() {
                 style={{
                   width: "100%",
                   padding: "1rem",
-                  backgroundColor: cargando ? "#ccc" : "#667eea",
+                  backgroundColor: cargando ? "#ccc" : "#096266",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",

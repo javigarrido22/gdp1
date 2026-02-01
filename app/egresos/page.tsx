@@ -45,6 +45,9 @@ export default function EgresosPage() {
     "Entretenimiento",
     "Ropa",
     "Tecnología",
+    "Tarjeta de crédito",
+    "Crédito consumo",
+    "Ahorro e inversión",
     "Otro"
   ];
 
