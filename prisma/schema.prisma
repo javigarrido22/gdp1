@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,12 +8,66 @@ datasource db {
 }
 
 model Usuario {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   nombres         String
   apellidos       String
-  correo          String   @unique
+  correo          String    @unique
   password        String
   telefono        String
-  fechaRegistro   DateTime @default(now())
+  fechaRegistro   DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  ingresos        Ingreso[]
+  egresos         Egreso[]
+  metas           Meta[]
+  codigosRecuperacion CodigoRecuperacion[]
+}
+
+model Ingreso {
+  id          Int      @id @default(autoincrement())
+  descripcion String
+  monto       Float
+  fecha       DateTime @default(now())
+  categoria   String
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Egreso {
+  id          Int      @id @default(autoincrement())
+  descripcion String
+  monto       Float
+  fecha       DateTime @default(now())
+  categoria   String
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Meta {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  montoObjetivo   Float
+  montoActual     Float    @default(0)
+  fechaInicio     DateTime @default(now())
+  fechaLimite     DateTime
+  categoria       String
+  completada      Boolean  @default(false)
+  usuarioId       Int
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+}
+
+model CodigoRecuperacion {
+  id          Int      @id @default(autoincrement())
+  codigo      String
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usado       Boolean  @default(false)
+  expiraEn    DateTime
+  createdAt   DateTime @default(now())
 }

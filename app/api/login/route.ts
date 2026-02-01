@@ -14,9 +14,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalizar correo a minúsculas
+    const correoNormalizado = correo.toLowerCase().trim();
+
     // Buscar usuario por correo
     const usuario = await prisma.usuario.findUnique({
-      where: { correo },
+      where: { correo: correoNormalizado },
     });
 
     if (!usuario) {

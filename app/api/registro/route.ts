@@ -15,9 +15,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // Normalizar correo a minúsculas
+    const correoNormalizado = correo.toLowerCase().trim();
+
     // Verificar si el correo ya existe
     const usuarioExistente = await prisma.usuario.findUnique({
-      where: { correo },
+      where: { correo: correoNormalizado },
     });
 
     if (usuarioExistente) {
@@ -35,7 +38,7 @@ export async function POST(request: Request) {
       data: {
         nombres,
         apellidos,
-        correo,
+        correo: correoNormalizado,
         password: hashedPassword,
         telefono,
       },
