@@ -1,0 +1,78 @@
+/* [project]/app/egresos/egresos.module.css [app-client] (css) */
+.egresos-module__4nMdDG__container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.egresos-module__4nMdDG__title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.egresos-module__4nMdDG__form {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.egresos-module__4nMdDG__form h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.egresos-module__4nMdDG__inputGroup {
+  margin-bottom: 15px;
+}
+
+.egresos-module__4nMdDG__inputGroup label {
+  color: #555;
+  margin-bottom: 5px;
+  font-weight: bold;
+  display: block;
+}
+
+.egresos-module__4nMdDG__inputGroup input {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.egresos-module__4nMdDG__button {
+  color: #fff;
+  cursor: pointer;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color .3s;
+}
+
+.egresos-module__4nMdDG__button:hover {
+  background-color: #218838;
+}
+
+.egresos-module__4nMdDG__errorMessage {
+  color: red;
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.egresos-module__4nMdDG__successMessage {
+  color: green;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+/*# sourceMappingURL=app_egresos_egresos_module_d0b38211.css.map*/

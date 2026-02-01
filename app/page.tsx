@@ -17,6 +17,7 @@ export default function Home() {
       <Link href="/ingresos" style={{ 
         display: "inline-block", 
         marginBottom: "1rem",
+        marginRight: "1rem", /* Espacio hacia la derecha */
         padding: "0.5rem 1rem",
         backgroundColor: "#4caf50",
         color: "white",
@@ -24,7 +25,19 @@ export default function Home() {
         borderRadius: "4px"
       }}>
         Ver Ingresos →
-      </Link>
+</Link>
+
+<Link href="/egresos" style={{ 
+        display: "inline-block", 
+        marginBottom: "1rem",
+        padding: "0.5rem 1rem",
+        backgroundColor: "#4caf50",
+        color: "white",
+        textDecoration: "none",
+        borderRadius: "4px"
+      }}>
+        Ver Egresos →
+</Link>
       
       <div className="carrusel">
         {datosFinancieros.map((item) => (
@@ -40,4 +53,4 @@ export default function Home() {
     </div>
   );
 }
->>>>>>> fddb0ddbf269489a5818ca1e71716ef521afb000
+
