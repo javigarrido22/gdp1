@@ -61,7 +61,7 @@ export default function LoginPage() {
       {/* Panel izquierdo - Imagen */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -96,13 +96,14 @@ export default function LoginPage() {
             marginBottom: "1rem",
             fontWeight: "700"
           }}>
-            ¡Bienvenido de nuevo!
+            ¡Bienvenido a OrdenateYa!
           </h1>
           <p style={{ 
             fontSize: "1.2rem", 
             opacity: 0.9,
             maxWidth: "400px",
-            lineHeight: "1.6"
+            lineHeight: "1.6",
+            textAlign:"center"
           }}>
             Gestiona tus finanzas de manera inteligente y alcanza tus metas financieras
           </p>
@@ -130,8 +131,8 @@ export default function LoginPage() {
             <Image 
               src="/ordenateya.png" 
               alt="OrdenateYA Logo" 
-              width={150} 
-              height={150}
+              width={200} 
+              height={200}
               style={{ objectFit: "contain" }}
             />
           </div>
@@ -253,7 +254,7 @@ export default function LoginPage() {
               style={{
                 width: "100%",
                 padding: "1rem",
-                backgroundColor: cargando ? "#ccc" : "#667eea",
+                backgroundColor: cargando ? "#ccc" : "#096266",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
@@ -288,7 +289,7 @@ export default function LoginPage() {
               ¿No tienes una cuenta?
             </p>
             <Link
-              href="/register"
+              href="/registro"
               style={{
                 color: "#667eea",
                 textDecoration: "none",
