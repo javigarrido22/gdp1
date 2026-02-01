@@ -1,4 +1,14 @@
 node_modules/
+<<<<<<< HEAD
+<<<<<<< HEAD
+.next/
+=======
 .next/
 .DS_Store
 *.log
+>>>>>>> origin/jp_gdp1
+=======
+.next/
+.DS_Store
+*.log
+>>>>>>> origin/jp_gdp1
