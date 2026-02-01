@@ -1,170 +1,242 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link"; // Importar Link de next/link
-import "./styles.css";
-
-const datosFinancieros = [
-  { id: 1, nombre: "Apple (AAPL)", precio: 185.32, cambio: "+1.2%" },
-  { id: 2, nombre: "Microsoft (MSFT)", precio: 412.15, cambio: "-0.5%" },
-  { id: 3, nombre: "Bitcoin (BTC)", precio: 43250.0, cambio: "+2.8%" },
-  { id: 4, nombre: "Ethereum (ETH)", precio: 3200.5, cambio: "+1.1%" },
-  { id: 5, nombre: "Tesla (TSLA)", precio: 245.7, cambio: "-3.2%" },
-];
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   const [usuario, setUsuario] = useState("");
   const [contraseña, setContraseña] = useState("");
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  const manejarEnvio = (e: React.FormEvent) => {
+  const manejarEnvio = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Usuario:", usuario, "Contraseña:", contraseña);
+    setError("");
+    setCargando(true);
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          correo: usuario,
+          password: contraseña,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Error al iniciar sesión');
+        setCargando(false);
+        return;
+      }
+
+      // Login exitoso - guardar datos del usuario
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      
+      // Redirigir al dashboard
+      window.location.href = "/dashboard";
+      
+    } catch (error) {
+      console.error("Error en el login:", error);
+      setError("Hubo un error al iniciar sesión. Intenta nuevamente.");
+      setCargando(false);
+    }
   };
 
   return (
-    <>
-      <div className="App">
-        <h1>📈 Dashboard Financiero</h1>
+    <div style={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      minHeight: "100vh" 
+    }}>
+      {/* Header  */}
+      <header style={{
+        backgroundColor: "white",
+        padding: "1rem 2rem",
+      }}>
+        <Image 
+          src="/ordenateya.png" 
+          alt="OrdenateYA Logo" 
+          width={150} 
+          height={150}
+          style={{ objectFit: "contain" }}
+        />
+      </header>
 
-        {/* Enlaces a otras páginas */}
-        <div style={{ marginBottom: "1rem" }}>
-          <Link
-            href="/ingresos"
+      {/* Body principal */}
+      <main style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem 1rem"
+      }}>
+        {/* Título centrado */}
+        <div style={{
+          marginBottom: "3rem",
+          textAlign: "center"
+        }}>
+          <h2
             style={{
-              display: "inline-block",
-              marginRight: "1rem",
-              padding: "0.5rem 1rem",
-              backgroundColor: "#4caf50",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "4px",
+              color: "black",
+              fontSize: "36px",
+              fontWeight: "bold",
+              margin: 0,
+              display: "inline-flex",
+              alignItems: "baseline",
             }}
           >
-            Ver Ingresos →
-          </Link>
-
-          <Link
-            href="/egresos"
-            style={{
-              display: "inline-block",
-              padding: "0.5rem 1rem",
-              backgroundColor: "#4caf50",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "4px",
-            }}
-          >
-            Ver Egresos →
-          </Link>
+            <span style={{ 
+              fontFamily: "Georgia, serif",
+              fontStyle: "italic",
+            }}>
+              Ordenate
+            </span>
+            <span style={{ 
+              fontFamily: "Lucida Handwriting, cursive",
+              fontStyle: "italic",
+              marginLeft: "0.2rem",
+            }}>
+              YA!
+            </span>
+          </h2>
         </div>
 
-        {/* Carrusel de datos financieros */}
-        <div className="carrusel" style={{ marginBottom: "2rem" }}>
-          {datosFinancieros.map((item) => (
-            <div
-              key={item.id}
-              className="card"
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                padding: "1rem",
-                marginBottom: "1rem",
-                // backgroundColor eliminado - sin color de fondo
-              }}
-            >
-              <h2 style={{ margin: "0 0 0.5rem 0" }}>{item.nombre}</h2>
-              <p style={{ margin: "0 0 0.5rem 0" }}>Precio: ${item.precio}</p>
-              <p
-                style={{
-                  margin: 0,
-                  color: item.cambio.startsWith("+") ? "green" : "red",
-                  fontWeight: "bold",
-                }}
-              >
-                Cambio: {item.cambio}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Formulario de inicio de sesión fuera del carrusel */}
-      <div
-        className="login-box"
-        style={{
-          maxWidth: "400px",
-          margin: "2rem auto",
-          padding: "2rem",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <h2
+        {/* Formulario de login */}
+        <div
           style={{
-            color: "black",
-            fontSize: "36px",
-            fontFamily: "Verdana, sans-serif",
-            fontWeight: "bold",
+            maxWidth: "400px",
+            width: "100%",
+            padding: "2rem",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           }}
         >
-          Bienvenido a OrdenateYA!
-        </h2>
-        <form onSubmit={manejarEnvio}>
-          <div className="form-group" style={{ marginBottom: "1rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-              Usuario:
-            </label>
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={usuario}
-              onChange={(e) => setUsuario(e.target.value)}
+          {error && (
+            <div style={{
+              backgroundColor: "#fee",
+              border: "1px solid #fcc",
+              borderRadius: "4px",
+              padding: "0.75rem",
+              marginBottom: "1rem",
+              color: "#c00",
+              fontSize: "0.9rem"
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={manejarEnvio}>
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
+                Correo Electrónico:
+              </label>
+              <input
+                type="email"
+                placeholder="correo@ejemplo.com"
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                disabled={cargando}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  color: "black",
+                  boxSizing: "border-box",
+                  opacity: cargando ? 0.6 : 1
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
+                Contraseña:
+              </label>
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={contraseña}
+                onChange={(e) => setContraseña(e.target.value)}
+                disabled={cargando}
+                style={{
+                  width: "100%",
+                  padding: "0.5rem",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  color: "black",
+                  boxSizing: "border-box",
+                  opacity: cargando ? 0.6 : 1
+                }}
+              />
+            </div>
+
+            <div style={{ marginTop: "1.5rem", marginBottom: "1.5rem", textAlign: "center" }}>
+              <Link
+                href="/registro"
+                style={{
+                  display: "block",
+                  marginBottom: "1rem",
+                  color: "#4CAF50",
+                  textDecoration: "none",
+                  fontSize: "16px",
+                  fontWeight: "500",
+                }}
+              >
+                Registrarse
+              </Link>
+              
+              <Link
+                href="/recuperar-password"
+                style={{
+                  display: "block",
+                  color: "#666",
+                  textDecoration: "none",
+                  fontSize: "14px",
+                }}
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            <button
+              type="submit"
+              disabled={cargando}
               style={{
+                padding: "10px 20px",
+                backgroundColor: cargando ? "#ccc" : "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: cargando ? "not-allowed" : "pointer",
+                fontSize: "16px",
                 width: "100%",
-                padding: "0.5rem",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                color: "black",
               }}
-            />
-          </div>
-          <div className="form-group" style={{ marginBottom: "1rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-              Contraseña:
-            </label>
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem",
-                border: "1px solid #ccc",
-                borderRadius: "4px",
-                color: "black",
-              }}
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "16px",
-              marginTop: "10px",
-              width: "100%",
-            }}
-          >
-            Acceder
-          </button>
-        </form>
-      </div>
-    </>
+            >
+              {cargando ? "Accediendo..." : "Acceder"}
+            </button>
+          </form>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{
+        backgroundColor: "#2c3e50",
+        color: "white",
+        padding: "2rem",
+        textAlign: "center"
+      }}>
+        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
+        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
+          Gestión financiera personal
+        </p>
+      </footer>
+    </div>
   );
 }

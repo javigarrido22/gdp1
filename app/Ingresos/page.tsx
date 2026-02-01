@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Bar, Pie } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
+import IndicadoresEconomicos from "../components/IndicadoresEconomicos";
 
 // Registrar los componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -109,162 +110,166 @@ const Ingresos = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h1>Ingresos</h1>
-
-      {/* Franja de meses */}
-      <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
-        {meses.map((mes, index) => (
+    <div style={{ padding: "2rem" }}>
+      <h1 style={{ textAlign: "center", color: "black" }}>Ingresos</h1>
+      
+      <IndicadoresEconomicos />
+      
+      <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+        {/* Franja de meses */}
+        <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
+          {meses.map((mes, index) => (
+            <button
+              key={index}
+              onClick={() => handleMesClick(index)}
+              style={{
+                padding: "10px",
+                backgroundColor: mesSeleccionado === index ? "#0070f3" : "#f0f0f0",
+                color: mesSeleccionado === index ? "#fff" : "#000",
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {mes}
+            </button>
+          ))}
           <button
-            key={index}
-            onClick={() => handleMesClick(index)}
+            onClick={() => setMesSeleccionado(null)}
             style={{
               padding: "10px",
-              backgroundColor: mesSeleccionado === index ? "#0070f3" : "#f0f0f0",
-              color: mesSeleccionado === index ? "#fff" : "#000",
+              backgroundColor: mesSeleccionado === null ? "#0070f3" : "#f0f0f0",
+              color: mesSeleccionado === null ? "#fff" : "#000",
               border: "1px solid #ddd",
               borderRadius: "5px",
               cursor: "pointer",
             }}
           >
-            {mes}
+            Todos
           </button>
-        ))}
+        </div>
+
+        {/* Lista de ingresos */}
+        <ul style={{ listStyleType: "none", padding: 0 }}>
+          {ingresosDelMes.map((ingreso) => (
+            <li
+              key={ingreso.id}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "5px",
+                padding: "10px",
+                marginBottom: "10px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <strong>{ingreso.fecha}</strong> - {ingreso.descripcion}: ${ingreso.monto}
+              </div>
+              <button
+                onClick={() => handleEliminarIngreso(ingreso.id)}
+                style={{
+                  padding: "5px 10px",
+                  backgroundColor: "#dc3545",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Eliminar
+              </button>
+            </li>
+          ))}
+        </ul>
+        {ingresosDelMes.length === 0 && <p>No hay ingresos para este mes.</p>}
+
+        {/* Botón para mostrar/ocultar formulario */}
         <button
-          onClick={() => setMesSeleccionado(null)}
+          onClick={() => setMostrarFormulario(!mostrarFormulario)}
           style={{
-            padding: "10px",
-            backgroundColor: mesSeleccionado === null ? "#0070f3" : "#f0f0f0",
-            color: mesSeleccionado === null ? "#fff" : "#000",
-            border: "1px solid #ddd",
+            padding: "10px 20px",
+            backgroundColor: "#0070f3",
+            color: "#fff",
+            border: "none",
             borderRadius: "5px",
             cursor: "pointer",
+            marginTop: "20px",
           }}
         >
-          Todos
+          {mostrarFormulario ? "Cancelar" : "Añadir"}
         </button>
-      </div>
 
-      {/* Lista de ingresos */}
-      <ul style={{ listStyleType: "none", padding: 0 }}>
-        {ingresosDelMes.map((ingreso) => (
-          <li
-            key={ingreso.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              padding: "10px",
-              marginBottom: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <strong>{ingreso.fecha}</strong> - {ingreso.descripcion}: ${ingreso.monto}
+        {/* Formulario para agregar ingresos */}
+        {mostrarFormulario && (
+          <div style={{ marginTop: "20px" }}>
+            <h2>Añadir nuevo ingreso</h2>
+            <div style={{ marginBottom: "10px" }}>
+              <label>
+                Fecha:
+                <input
+                  type="date"
+                  name="fecha"
+                  value={nuevoIngreso.fecha}
+                  onChange={handleInputChange}
+                  style={{ marginLeft: "10px", padding: "5px" }}
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: "10px" }}>
+              <label>
+                Descripción:
+                <input
+                  type="text"
+                  name="descripcion"
+                  value={nuevoIngreso.descripcion}
+                  onChange={handleInputChange}
+                  placeholder="Descripción"
+                  style={{ marginLeft: "10px", padding: "5px" }}
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: "10px" }}>
+              <label>
+                Monto:
+                <input
+                  type="number"
+                  name="monto"
+                  value={nuevoIngreso.monto}
+                  onChange={handleInputChange}
+                  placeholder="Monto"
+                  style={{ marginLeft: "10px", padding: "5px" }}
+                />
+              </label>
             </div>
             <button
-              onClick={() => handleEliminarIngreso(ingreso.id)}
+              onClick={handleAgregarIngreso}
               style={{
-                padding: "5px 10px",
-                backgroundColor: "#dc3545",
+                padding: "10px 20px",
+                backgroundColor: "#28a745",
                 color: "#fff",
                 border: "none",
                 borderRadius: "5px",
                 cursor: "pointer",
               }}
             >
-              Eliminar
+              Agregar
             </button>
-          </li>
-        ))}
-      </ul>
-      {ingresosDelMes.length === 0 && <p>No hay ingresos para este mes.</p>}
-
-      {/* Botón para mostrar/ocultar formulario */}
-      <button
-        onClick={() => setMostrarFormulario(!mostrarFormulario)}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#0070f3",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginTop: "20px",
-        }}
-      >
-        {mostrarFormulario ? "Cancelar" : "Añadir"}
-      </button>
-
-      {/* Formulario para agregar ingresos */}
-      {mostrarFormulario && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Añadir nuevo ingreso</h2>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Fecha:
-              <input
-                type="date"
-                name="fecha"
-                value={nuevoIngreso.fecha}
-                onChange={handleInputChange}
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
+            {mensajeError && <p style={{ color: "red", marginTop: "10px" }}>{mensajeError}</p>}
           </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Descripción:
-              <input
-                type="text"
-                name="descripcion"
-                value={nuevoIngreso.descripcion}
-                onChange={handleInputChange}
-                placeholder="Descripción"
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Monto:
-              <input
-                type="number"
-                name="monto"
-                value={nuevoIngreso.monto}
-                onChange={handleInputChange}
-                placeholder="Monto"
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
-          </div>
-          <button
-            onClick={handleAgregarIngreso}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Agregar
-          </button>
-          {mensajeError && <p style={{ color: "red", marginTop: "10px" }}>{mensajeError}</p>}
-        </div>
-      )}
+        )}
 
-      {mensajeExito && <p style={{ color: "green", marginTop: "20px" }}>{mensajeExito}</p>}
+        {mensajeExito && <p style={{ color: "green", marginTop: "20px" }}>{mensajeExito}</p>}
 
-      {/* Gráfico de torta */}
-      {mesSeleccionado !== null && ingresosDelMes.length > 0 && (
-        <div style={{ marginTop: "40px" }}>
-          <h2>Distribución de ingresos en {meses[mesSeleccionado]}</h2>
-          <Pie data={dataPie} />
-        </div>
-      )}
+        {/* Gráfico de torta */}
+        {mesSeleccionado !== null && ingresosDelMes.length > 0 && (
+          <div style={{ marginTop: "40px" }}>
+            <h2>Distribución de ingresos en {meses[mesSeleccionado]}</h2>
+            <Pie data={dataPie} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

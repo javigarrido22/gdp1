@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Tesseract from "tesseract.js"; // Importar Tesseract.js para OCR
+import IndicadoresEconomicos from "../components/IndicadoresEconomicos";
 
 const Egresos = () => {
   const [egresos, setEgresos] = useState([
@@ -318,4 +319,14 @@ const Egresos = () => {
   );
 };
 
-export default Egresos;
+export default function EgresosPage() {
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1 style={{ textAlign: "center", color: "black" }}>Egresos</h1>
+      
+      <IndicadoresEconomicos />
+      
+      <Egresos />
+    </div>
+  );
+}
