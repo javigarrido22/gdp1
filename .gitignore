@@ -12,3 +12,5 @@ node_modules/
 .DS_Store
 *.log
 >>>>>>> origin/jp_gdp1
+
+/app/generated/prisma

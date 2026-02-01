@@ -1,272 +1,575 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bar, Pie } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
-// Registrar los componentes de Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
+interface Usuario {
+  id: number;
+  nombres: string;
+  apellidos: string;
+  correo: string;
+}
 
-const Ingresos = () => {
-  const [ingresos, setIngresos] = useState([
-    { id: 1, fecha: "2023-01-15", descripcion: "Salario", monto: 1500 },
-    { id: 2, fecha: "2023-02-10", descripcion: "Venta de productos", monto: 300 },
-    { id: 3, fecha: "2023-02-20", descripcion: "Intereses bancarios", monto: 50 },
-    { id: 4, fecha: "2023-03-05", descripcion: "Proyecto freelance", monto: 800 },
-    { id: 5, fecha: "2023-03-15", descripcion: "Venta de equipo", monto: 400 },
-  ]);
+interface Ingreso {
+  id: number;
+  descripcion: string;
+  monto: number;
+  fecha: string;
+  categoria: string;
+}
 
-  const [nuevoIngreso, setNuevoIngreso] = useState({
-    fecha: "",
+export default function IngresosPage() {
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [ingresos, setIngresos] = useState<Ingreso[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [formData, setFormData] = useState({
     descripcion: "",
     monto: "",
+    fecha: new Date().toISOString().split('T')[0],
+    categoria: "Salario"
   });
+  const [error, setError] = useState("");
+  const [exito, setExito] = useState("");
+  const router = useRouter();
 
-  const [mesSeleccionado, setMesSeleccionado] = useState<number | null>(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [mensajeExito, setMensajeExito] = useState("");
-  const [mensajeError, setMensajeError] = useState("");
-
-  const meses = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
+  const categorias = [
+    "Salario",
+    "Freelance",
+    "Inversiones",
+    "Venta",
+    "Regalo",
+    "Bono",
+    "Otro"
   ];
 
-  // Filtrar ingresos por el mes seleccionado
-  const ingresosDelMes = mesSeleccionado !== null
-    ? ingresos.filter((ingreso) => new Date(ingreso.fecha).getMonth() === mesSeleccionado)
-    : ingresos;
-
-  // Datos para el gráfico de torta
-  const dataPie = {
-    labels: ingresosDelMes.map((ingreso) => ingreso.descripcion),
-    datasets: [
-      {
-        data: ingresosDelMes.map((ingreso) => ingreso.monto),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-        hoverBackgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#FF9F40",
-        ],
-      },
-    ],
-  };
-
-  const handleMesClick = (mes: number) => {
-    setMesSeleccionado(mes);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNuevoIngreso({ ...nuevoIngreso, [name]: value });
-  };
-
-  const handleAgregarIngreso = () => {
-    if (!nuevoIngreso.fecha || !nuevoIngreso.descripcion || !nuevoIngreso.monto) {
-      setMensajeError("Favor completa todos los campos");
+  useEffect(() => {
+    const usuarioGuardado = localStorage.getItem('usuario');
+    
+    if (!usuarioGuardado) {
+      router.push('/');
       return;
     }
 
-    setIngresos([
-      ...ingresos,
-      {
-        id: ingresos.length + 1,
-        fecha: nuevoIngreso.fecha,
-        descripcion: nuevoIngreso.descripcion,
-        monto: parseFloat(nuevoIngreso.monto),
-      },
-    ]);
+    const usuarioData = JSON.parse(usuarioGuardado);
+    setUsuario(usuarioData);
+    cargarIngresos(usuarioData.id);
+  }, [router]);
 
-    setNuevoIngreso({ fecha: "", descripcion: "", monto: "" });
-    setMensajeError("");
-    setMensajeExito("Se ha añadido con éxito");
-    setTimeout(() => setMensajeExito(""), 3000);
+  const cargarIngresos = async (usuarioId: number) => {
+    try {
+      const response = await fetch(`/api/ingresos?usuarioId=${usuarioId}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setIngresos(data.ingresos);
+      }
+    } catch (error) {
+      console.error('Error al cargar ingresos:', error);
+    } finally {
+      setCargando(false);
+    }
   };
 
-  const handleEliminarIngreso = (id: number) => {
-    setIngresos(ingresos.filter((ingreso) => ingreso.id !== id));
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setExito("");
+
+    if (!usuario) return;
+
+    if (!formData.descripcion || !formData.monto) {
+      setError("Descripción y monto son requeridos");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/ingresos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          usuarioId: usuario.id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Error al crear ingreso');
+        return;
+      }
+
+      setExito('¡Ingreso agregado exitosamente!');
+      setFormData({
+        descripcion: "",
+        monto: "",
+        fecha: new Date().toISOString().split('T')[0],
+        categoria: "Salario"
+      });
+      setMostrarFormulario(false);
+      cargarIngresos(usuario.id);
+
+      setTimeout(() => setExito(""), 3000);
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Error al procesar la solicitud');
+    }
   };
+
+  const handleEliminar = async (id: number) => {
+    if (!usuario) return;
+    
+    if (!confirm('¿Estás seguro de eliminar este ingreso?')) return;
+
+    try {
+      const response = await fetch(`/api/ingresos?id=${id}&usuarioId=${usuario.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setExito('Ingreso eliminado exitosamente');
+        cargarIngresos(usuario.id);
+        setTimeout(() => setExito(""), 3000);
+      }
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      setError('Error al eliminar el ingreso');
+    }
+  };
+
+  const cerrarSesion = () => {
+    localStorage.removeItem('usuario');
+    router.push('/');
+  };
+
+  const formatearMonto = (monto: number) => {
+    return new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP'
+    }).format(monto);
+  };
+
+  const formatearFecha = (fecha: string) => {
+    return new Date(fecha).toLocaleDateString('es-CL', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  if (!usuario || cargando) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        Cargando...
+      </div>
+    );
+  }
+
+  const totalIngresos = ingresos.reduce((sum, ing) => sum + Number(ing.monto), 0);
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h1>Ingresos</h1>
-
-      {/* Franja de meses */}
-      <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
-        {meses.map((mes, index) => (
-          <button
-            key={index}
-            onClick={() => handleMesClick(index)}
-            style={{
-              padding: "10px",
-              backgroundColor: mesSeleccionado === index ? "#0070f3" : "#f0f0f0",
-              color: mesSeleccionado === index ? "#fff" : "#000",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            {mes}
-          </button>
-        ))}
-        <button
-          onClick={() => setMesSeleccionado(null)}
-          style={{
-            padding: "10px",
-            backgroundColor: mesSeleccionado === null ? "#0070f3" : "#f0f0f0",
-            color: mesSeleccionado === null ? "#fff" : "#000",
-            border: "1px solid #ddd",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-        >
-          Todos
-        </button>
-      </div>
-
-      {/* Lista de ingresos */}
-      <ul style={{ listStyleType: "none", padding: 0 }}>
-        {ingresosDelMes.map((ingreso) => (
-          <li
-            key={ingreso.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              padding: "10px",
-              marginBottom: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <strong>{ingreso.fecha}</strong> - {ingreso.descripcion}: ${ingreso.monto}
-            </div>
-            <button
-              onClick={() => handleEliminarIngreso(ingreso.id)}
-              style={{
-                padding: "5px 10px",
-                backgroundColor: "#dc3545",
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Eliminar
-            </button>
-          </li>
-        ))}
-      </ul>
-      {ingresosDelMes.length === 0 && <p>No hay ingresos para este mes.</p>}
-
-      {/* Botón para mostrar/ocultar formulario */}
-      <button
-        onClick={() => setMostrarFormulario(!mostrarFormulario)}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#0070f3",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginTop: "20px",
-        }}
-      >
-        {mostrarFormulario ? "Cancelar" : "Añadir"}
-      </button>
-
-      {/* Formulario para agregar ingresos */}
-      {mostrarFormulario && (
-        <div style={{ marginTop: "20px" }}>
-          <h2>Añadir nuevo ingreso</h2>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Fecha:
-              <input
-                type="date"
-                name="fecha"
-                value={nuevoIngreso.fecha}
-                onChange={handleInputChange}
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Descripción:
-              <input
-                type="text"
-                name="descripcion"
-                value={nuevoIngreso.descripcion}
-                onChange={handleInputChange}
-                placeholder="Descripción"
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Monto:
-              <input
-                type="number"
-                name="monto"
-                value={nuevoIngreso.monto}
-                onChange={handleInputChange}
-                placeholder="Monto"
-                style={{ marginLeft: "10px", padding: "5px" }}
-              />
-            </label>
+    <div style={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      minHeight: "100vh",
+      backgroundColor: "#f5f5f5"
+    }}>
+      {/* Header */}
+      <header style={{
+        backgroundColor: "white",
+        padding: "1rem 2rem",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+      }}>
+        <Link href="/dashboard">
+          <Image 
+            src="/ordenateya.png" 
+            alt="OrdenateYA Logo" 
+            width={120} 
+            height={120}
+            style={{ objectFit: "contain", cursor: "pointer" }}
+          />
+        </Link>
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <div style={{ textAlign: "right" }}>
+            <p style={{ margin: 0, color: "black", fontWeight: "600", fontSize: "1rem" }}>
+              {usuario.nombres} {usuario.apellidos}
+            </p>
+            <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>
+              {usuario.correo}
+            </p>
           </div>
           <button
-            onClick={handleAgregarIngreso}
+            onClick={cerrarSesion}
             style={{
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "#fff",
+              padding: "0.6rem 1.2rem",
+              backgroundColor: "#e74c3c",
+              color: "white",
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",
+              fontSize: "0.9rem",
+              fontWeight: "500"
             }}
           >
-            Agregar
+            Cerrar Sesión
           </button>
-          {mensajeError && <p style={{ color: "red", marginTop: "10px" }}>{mensajeError}</p>}
         </div>
-      )}
+      </header>
 
-      {mensajeExito && <p style={{ color: "green", marginTop: "20px" }}>{mensajeExito}</p>}
+      {/* Navegación */}
+      <div style={{
+        backgroundColor: "white",
+        padding: "1rem 2rem",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+        display: "flex",
+        gap: "1rem"
+      }}>
+        <Link
+          href="/dashboard"
+          style={{
+            padding: "0.5rem 1rem",
+            color: "#666",
+            textDecoration: "none",
+            borderRadius: "4px",
+            transition: "background-color 0.2s"
+          }}
+        >
+          ← Dashboard
+        </Link>
+        <Link
+          href="/ingresos"
+          style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: "#4caf50",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: "4px",
+            fontWeight: "500"
+          }}
+        >
+          Ingresos
+        </Link>
+        <Link
+          href="/egresos"
+          style={{
+            padding: "0.5rem 1rem",
+            color: "#666",
+            textDecoration: "none",
+            borderRadius: "4px",
+            transition: "background-color 0.2s"
+          }}
+        >
+          Egresos
+        </Link>
+      </div>
 
-      {/* Gráfico de torta */}
-      {mesSeleccionado !== null && ingresosDelMes.length > 0 && (
-        <div style={{ marginTop: "40px" }}>
-          <h2>Distribución de ingresos en {meses[mesSeleccionado]}</h2>
-          <Pie data={dataPie} />
+      {/* Contenido principal */}
+      <main style={{ flex: 1, padding: "2rem 1rem" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          {/* Encabezado */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "2rem"
+          }}>
+            <h1 style={{ color: "#2c3e50", margin: 0 }}>
+              📈 Mis Ingresos
+            </h1>
+            <button
+              onClick={() => setMostrarFormulario(!mostrarFormulario)}
+              style={{
+                padding: "0.75rem 1.5rem",
+                backgroundColor: "#4caf50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontSize: "1rem",
+                fontWeight: "500"
+              }}
+            >
+              {mostrarFormulario ? "✕ Cancelar" : "➕ Nuevo Ingreso"}
+            </button>
+          </div>
+
+          {/* Mensajes */}
+          {error && (
+            <div style={{
+              backgroundColor: "#fee",
+              border: "1px solid #fcc",
+              borderRadius: "4px",
+              padding: "0.75rem",
+              marginBottom: "1rem",
+              color: "#c00"
+            }}>
+              {error}
+            </div>
+          )}
+
+          {exito && (
+            <div style={{
+              backgroundColor: "#efe",
+              border: "1px solid #cfc",
+              borderRadius: "4px",
+              padding: "0.75rem",
+              marginBottom: "1rem",
+              color: "#090"
+            }}>
+              {exito}
+            </div>
+          )}
+
+          {/* Formulario */}
+          {mostrarFormulario && (
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "8px",
+              padding: "2rem",
+              marginBottom: "2rem",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            }}>
+              <h2 style={{ color: "#2c3e50", marginTop: 0 }}>Agregar Nuevo Ingreso</h2>
+              <form onSubmit={handleSubmit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                  <div>
+                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                      Descripción *
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.descripcion}
+                      onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+                      placeholder="Ej: Pago de salario"
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "1rem",
+                        boxSizing: "border-box"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                      Monto (CLP) *
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.monto}
+                      onChange={(e) => setFormData({...formData, monto: e.target.value})}
+                      placeholder="0"
+                      required
+                      min="0"
+                      step="1"
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "1rem",
+                        boxSizing: "border-box"
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                      Categoría
+                    </label>
+                    <select
+                      value={formData.categoria}
+                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "1rem",
+                        boxSizing: "border-box"
+                      }}
+                    >
+                      {categorias.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                      Fecha
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.fecha}
+                      onChange={(e) => setFormData({...formData, fecha: e.target.value})}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "1rem",
+                        boxSizing: "border-box"
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  style={{
+                    padding: "0.75rem 2rem",
+                    backgroundColor: "#4caf50",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    fontSize: "1rem",
+                    fontWeight: "500"
+                  }}
+                >
+                  Guardar Ingreso
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Resumen */}
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "1.5rem",
+            marginBottom: "2rem",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            border: "2px solid #4caf50"
+          }}>
+            <h3 style={{ margin: "0 0 1rem 0", color: "#2c3e50" }}>Resumen</h3>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Total de Ingresos</p>
+                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#4caf50" }}>
+                  {formatearMonto(totalIngresos)}
+                </p>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Cantidad de Registros</p>
+                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#2c3e50" }}>
+                  {ingresos.length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Lista de ingresos */}
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "1.5rem",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+          }}>
+            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>Historial</h3>
+            
+            {ingresos.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "3rem", color: "#999" }}>
+                <p style={{ fontSize: "3rem", margin: 0 }}>📊</p>
+                <p style={{ fontSize: "1.1rem", margin: "1rem 0 0 0" }}>
+                  No hay ingresos registrados
+                </p>
+                <p style={{ fontSize: "0.9rem", margin: "0.5rem 0 0 0" }}>
+                  Agrega tu primer ingreso usando el botón de arriba
+                </p>
+              </div>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid #e0e0e0" }}>
+                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Fecha</th>
+                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Descripción</th>
+                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Categoría</th>
+                      <th style={{ padding: "1rem", textAlign: "right", color: "#666", fontWeight: "600" }}>Monto</th>
+                      <th style={{ padding: "1rem", textAlign: "center", color: "#666", fontWeight: "600" }}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ingresos.map((ingreso) => (
+                      <tr key={ingreso.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
+                        <td style={{ padding: "1rem", color: "#666" }}>
+                          {formatearFecha(ingreso.fecha)}
+                        </td>
+                        <td style={{ padding: "1rem", color: "#2c3e50", fontWeight: "500" }}>
+                          {ingreso.descripcion}
+                        </td>
+                        <td style={{ padding: "1rem" }}>
+                          <span style={{
+                            padding: "0.25rem 0.75rem",
+                            backgroundColor: "#e8f5e9",
+                            color: "#2e7d32",
+                            borderRadius: "12px",
+                            fontSize: "0.85rem",
+                            fontWeight: "500"
+                          }}>
+                            {ingreso.categoria}
+                          </span>
+                        </td>
+                        <td style={{ padding: "1rem", textAlign: "right", color: "#4caf50", fontWeight: "600", fontSize: "1.1rem" }}>
+                          {formatearMonto(Number(ingreso.monto))}
+                        </td>
+                        <td style={{ padding: "1rem", textAlign: "center" }}>
+                          <button
+                            onClick={() => handleEliminar(ingreso.id)}
+                            style={{
+                              padding: "0.5rem 1rem",
+                              backgroundColor: "#f44336",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                              fontSize: "0.85rem"
+                            }}
+                          >
+                            🗑️ Eliminar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </main>
+
+      {/* Footer */}
+      <footer style={{
+        backgroundColor: "#2c3e50",
+        color: "white",
+        padding: "2rem",
+        textAlign: "center"
+      }}>
+        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
+        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
+          Gestión financiera personal
+        </p>
+      </footer>
     </div>
   );
-};
-
-export default Ingresos;
+}
