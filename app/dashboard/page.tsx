@@ -602,7 +602,8 @@ export default function DashboardPage() {
             backgroundColor: "white",
             borderRadius: "8px",
             padding: "1.5rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1),",
+            border: "2px solid #ddd"
           }}>
             <h3 style={{ color: "#2c3e50", marginTop: 0, marginBottom: "1rem" }}>
               ⚡ Acciones Rápidas
