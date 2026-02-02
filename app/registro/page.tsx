@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function RegistroPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     nombres: "",
     apellidos: "",
@@ -17,6 +18,7 @@ export default function RegistroPage() {
 
   const [errores, setErrores] = useState<string[]>([]);
   const [exitoso, setExitoso] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -46,8 +48,6 @@ export default function RegistroPage() {
     }
     if (!formData.telefono.trim()) {
       nuevosErrores.push("El teléfono es requerido");
-    } else if (!/^\+?[\d\s-]{8,}$/.test(formData.telefono)) {
-      nuevosErrores.push("El teléfono no es válido");
     }
     if (!formData.aceptaTerminos) {
       nuevosErrores.push("Debes aceptar los términos y condiciones");
@@ -58,57 +58,45 @@ export default function RegistroPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setErrores([]);
+
     const nuevosErrores = validarFormulario();
-    
     if (nuevosErrores.length > 0) {
       setErrores(nuevosErrores);
       return;
     }
 
-    setErrores([]);
+    setCargando(true);
 
     try {
-      const response = await fetch('/api/registro', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const response = await fetch("/api/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nombres: formData.nombres,
-          apellidos: formData.apellidos,
-          correo: formData.correo,
+          nombre: `${formData.nombres} ${formData.apellidos}`,
+          email: formData.correo,
           password: formData.password,
           telefono: formData.telefono,
         }),
       });
 
-      // Verificar si la respuesta es JSON
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        console.error("Respuesta no es JSON:", await response.text());
-        setErrores(["Error del servidor. Por favor intenta nuevamente."]);
-        return;
-      }
-
       const data = await response.json();
 
       if (!response.ok) {
-        setErrores([data.error || 'Error al procesar el registro']);
+        setErrores([data.error || "Error al procesar el registro"]);
+        setCargando(false);
         return;
       }
 
-      // Registro exitoso
       setExitoso(true);
-      
-      // Redirigir después de 3 segundos
+
       setTimeout(() => {
-        window.location.href = "/";
+        router.push("/");
       }, 3000);
-      
     } catch (error) {
       console.error("Error en el registro:", error);
       setErrores(["Hubo un error al procesar el registro. Intenta nuevamente."]);
+      setCargando(false);
     }
   };
 
@@ -116,48 +104,31 @@ export default function RegistroPage() {
     return (
       <div style={{ 
         display: "flex", 
-        flexDirection: "column", 
-        minHeight: "100vh" 
+        minHeight: "100vh",
+        backgroundColor: "#f5f5f5",
+        alignItems: "center",
+        justifyContent: "center"
       }}>
-        <header style={{
-          backgroundColor: "white",
-          padding: "1rem 2rem",
+        <div style={{
+          maxWidth: "500px",
+          width: "100%",
+          padding: "3rem",
+          backgroundColor: "#fff",
+          borderRadius: "12px",
+          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+          textAlign: "center"
         }}>
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={150} 
-            height={150}
-            style={{ objectFit: "contain" }}
-          />
-        </header>
-
-        <main style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "2rem 1rem"
-        }}>
-          <div style={{
-            maxWidth: "500px",
-            width: "100%",
-            padding: "3rem",
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            textAlign: "center"
-          }}>
-            <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>✅</div>
-            <h2 style={{ color: "#4CAF50", marginBottom: "1rem" }}>¡Registro Exitoso!</h2>
-            <p style={{ color: "#666", marginBottom: "1.5rem" }}>
-              Se ha enviado un correo de confirmación a <strong>{formData.correo}</strong>
-            </p>
-            <p style={{ color: "#999", fontSize: "0.9rem" }}>
-              Serás redirigido al inicio de sesión en unos segundos...
-            </p>
-          </div>
-        </main>
+          <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>✅</div>
+          <h2 style={{ color: "#4CAF50", marginBottom: "1rem", fontSize: "1.8rem" }}>
+            ¡Registro Exitoso!
+          </h2>
+          <p style={{ color: "#666", marginBottom: "1.5rem" }}>
+            Se ha enviado un correo de confirmación a <strong>{formData.correo}</strong>
+          </p>
+          <p style={{ color: "#999", fontSize: "0.9rem" }}>
+            Serás redirigido al inicio de sesión en unos segundos...
+          </p>
+        </div>
       </div>
     );
   }
@@ -165,74 +136,129 @@ export default function RegistroPage() {
   return (
     <div style={{ 
       display: "flex", 
-      flexDirection: "column", 
-      minHeight: "100vh" 
+      minHeight: "100vh",
+      backgroundColor: "#f5f5f5"
     }}>
-      <header style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-      }}>
-        <Link href="/">
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={150} 
-            height={150}
-            style={{ objectFit: "contain", cursor: "pointer" }}
-          />
-        </Link>
-      </header>
-
-      <main style={{
+      {/* Panel izquierdo - Imagen */}
+      <div style={{
         flex: 1,
+        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "2rem 1rem"
+        padding: "2rem",
+        position: "relative",
+        overflow: "hidden"
       }}>
         <div style={{
-          marginBottom: "2rem",
-          textAlign: "center"
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.1,
+          backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)"
+        }}></div>
+        
+        <div style={{ 
+          zIndex: 1, 
+          textAlign: "center",
+          color: "white"
+        }}>
+          <div style={{ 
+            fontSize: "4rem", 
+            marginBottom: "1rem",
+            animation: "float 3s ease-in-out infinite"
+          }}>
+            💰
+          </div>
+          <h1 style={{ 
+            fontSize: "2.5rem", 
+            marginBottom: "1rem",
+            fontWeight: "700"
+          }}>
+            ¡Únete a OrdenateYA!
+          </h1>
+          <p style={{ 
+            fontSize: "1.2rem", 
+            opacity: 0.9,
+            maxWidth: "400px",
+            lineHeight: "1.6",
+            margin: "0 auto"  
+          }}>
+            Crea tu cuenta y comienza a gestionar tus finanzas de manera inteligente
+          </p>
+        </div>
+      </div>
+
+      {/* Panel derecho - Formulario de Registro */}
+      <div style={{
+        flex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem",
+        overflowY: "auto"
+      }}>
+        <div style={{
+          width: "100%",
+          maxWidth: "450px",
+          backgroundColor: "white",
+          borderRadius: "12px",
+          padding: "3rem",
+          boxShadow: "0 10px 40px rgba(0,0,0,0.1)"
         }}>
           <h2 style={{
-            color: "black",
-            fontSize: "32px",
-            fontWeight: "bold",
-            margin: 0,
+            textAlign: "center",
+            color: "#2c3e50",
+            marginBottom: "0.5rem",
+            fontSize: "1.8rem"
           }}>
             Crear Cuenta
           </h2>
-        </div>
 
-        <div style={{
-          maxWidth: "500px",
-          width: "100%",
-          padding: "2rem",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        }}>
+          <p style={{
+            textAlign: "center",
+            color: "#666",
+            marginBottom: "2rem",
+            fontSize: "0.95rem"
+          }}>
+            Completa tus datos para registrarte
+          </p>
+
+          {/* Mensajes de error */}
           {errores.length > 0 && (
             <div style={{
               backgroundColor: "#fee",
               border: "1px solid #fcc",
-              borderRadius: "4px",
+              borderRadius: "8px",
               padding: "1rem",
-              marginBottom: "1.5rem"
+              marginBottom: "1rem"
             }}>
               {errores.map((error, index) => (
-                <p key={index} style={{ color: "#c00", margin: "0.25rem 0", fontSize: "0.9rem" }}>
+                <p key={index} style={{
+                  color: "#c00",
+                  fontSize: "0.9rem",
+                  margin: "0.25rem 0"
+                }}>
                   • {error}
                 </p>
               ))}
             </div>
           )}
 
+          {/* Formulario */}
           <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Nombres *
+            {/* Nombres */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Nombres
               </label>
               <input
                 type="text"
@@ -240,20 +266,32 @@ export default function RegistroPage() {
                 value={formData.nombres}
                 onChange={handleChange}
                 placeholder="Ingresa tus nombres"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Apellidos *
+            {/* Apellidos */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Apellidos
               </label>
               <input
                 type="text"
@@ -261,62 +299,98 @@ export default function RegistroPage() {
                 value={formData.apellidos}
                 onChange={handleChange}
                 placeholder="Ingresa tus apellidos"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Correo Electrónico *
+            {/* Correo */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Correo Electrónico
               </label>
               <input
                 type="email"
                 name="correo"
                 value={formData.correo}
                 onChange={handleChange}
-                placeholder="correo@ejemplo.com"
+                placeholder="tu@ejemplo.com"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Teléfono *
+            {/* Teléfono */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Teléfono
               </label>
               <input
                 type="tel"
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
-                placeholder="+56 9 1234 5678"
+                placeholder="+56912345678"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Contraseña *
+            {/* Contraseña */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Contraseña
               </label>
               <input
                 type="password"
@@ -324,20 +398,32 @@ export default function RegistroPage() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Mínimo 6 caracteres"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={{ display: "block", marginBottom: "0.5rem", color: "black" }}>
-                Confirmar Contraseña *
+            {/* Confirmar Contraseña */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{
+                display: "block",
+                marginBottom: "0.5rem",
+                color: "#2c3e50",
+                fontWeight: "500",
+                fontSize: "0.95rem"
+              }}>
+                Confirmar Contraseña
               </label>
               <input
                 type="password"
@@ -345,80 +431,125 @@ export default function RegistroPage() {
                 value={formData.confirmarPassword}
                 onChange={handleChange}
                 placeholder="Repite tu contraseña"
+                required
+                disabled={cargando}
                 style={{
                   width: "100%",
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  color: "black",
+                  padding: "0.875rem",
+                  border: "2px solid #e0e0e0",
+                  borderRadius: "8px",
+                  fontSize: "1rem",
+                  transition: "border-color 0.3s",
                   boxSizing: "border-box"
                 }}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
               />
             </div>
 
-            <div style={{ marginBottom: "1.5rem", marginTop: "1.5rem" }}>
-              <label style={{ 
-                display: "flex", 
-                alignItems: "center", 
-                color: "black",
-                cursor: "pointer"
+            {/* Términos y Condiciones */}
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label style={{
+                display: "flex",
+                alignItems: "flex-start",
+                cursor: "pointer",
+                fontSize: "0.9rem",
+                color: "#666"
               }}>
                 <input
                   type="checkbox"
                   name="aceptaTerminos"
                   checked={formData.aceptaTerminos}
                   onChange={handleChange}
-                  style={{ marginRight: "0.5rem", cursor: "pointer" }}
+                  disabled={cargando}
+                  style={{
+                    marginRight: "0.5rem",
+                    marginTop: "0.25rem",
+                    cursor: "pointer"
+                  }}
                 />
-                <span style={{ fontSize: "0.9rem" }}>
+                <span>
                   Acepto los{" "}
-                  <Link href="/terminos" style={{ color: "#4CAF50", textDecoration: "underline" }}>
+                  <Link
+                    href="/terminos"
+                    style={{
+                      color: "#667eea",
+                      textDecoration: "none",
+                      fontWeight: "500"
+                    }}
+                  >
                     términos y condiciones
                   </Link>
                 </span>
               </label>
             </div>
 
+            {/* Botón Submit */}
             <button
               type="submit"
+              disabled={cargando}
               style={{
-                padding: "10px 20px",
-                backgroundColor: "#4CAF50",
+                width: "100%",
+                padding: "1rem",
+                backgroundColor: cargando ? "#ccc" : "#096266",
                 color: "white",
                 border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "16px",
-                width: "100%",
-                fontWeight: "500"
+                borderRadius: "8px",
+                fontSize: "1.1rem",
+                fontWeight: "600",
+                cursor: cargando ? "not-allowed" : "pointer",
+                transition: "background-color 0.3s",
+                marginBottom: "1rem"
               }}
+              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#04474b")}
+              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#096266")}
             >
-              Registrar
+              {cargando ? "Registrando..." : "Crear Cuenta"}
             </button>
           </form>
 
-          <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
-            <p style={{ color: "#666", fontSize: "0.9rem" }}>
-              ¿Ya tienes cuenta?{" "}
-              <Link href="/" style={{ color: "#4CAF50", textDecoration: "none", fontWeight: "500" }}>
-                Inicia sesión
-              </Link>
+          {/* Separador */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            margin: "1.5rem 0",
+            gap: "1rem"
+          }}>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
+            <span style={{ color: "#999", fontSize: "0.9rem" }}>o</span>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
+          </div>
+
+          {/* Enlace a Login */}
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#666", marginBottom: "0.5rem", fontSize: "0.95rem" }}>
+              ¿Ya tienes una cuenta?
             </p>
+            <Link
+              href="/"
+              style={{
+                color: "#667eea",
+                textDecoration: "none",
+                fontSize: "1rem",
+                fontWeight: "600"
+              }}
+            >
+              Inicia sesión aquí
+            </Link>
           </div>
         </div>
-      </main>
+      </div>
 
-      <footer style={{
-        backgroundColor: "#2c3e50",
-        color: "white",
-        padding: "2rem",
-        textAlign: "center"
-      }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
-          Gestión financiera personal
-        </p>
-      </footer>
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
