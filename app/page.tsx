@@ -280,7 +280,7 @@ export default function LoginPage() {
               ¿No tienes una cuenta?
             </p>
             <Link
-              href="/register"
+              href="/registro"
               style={{
                 color: "#667eea",
                 textDecoration: "none",
