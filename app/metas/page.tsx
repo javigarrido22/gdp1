@@ -299,7 +299,7 @@ export default function MetasPage() {
             borderRadius: "4px"
           }}
         >
-          ← Dashboard
+          ← Vista general
         </Link>
         <Link
           href="/ingresos"
@@ -798,7 +798,7 @@ export default function MetasPage() {
 
       {/* Footer */}
       <footer style={{
-        backgroundColor: "#2c3e50",
+        backgroundColor: "#096266",
         color: "white",
         padding: "2rem",
         textAlign: "center",

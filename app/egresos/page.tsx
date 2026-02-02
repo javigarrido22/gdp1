@@ -3,450 +3,330 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-
-interface Usuario {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  correo: string;
-}
-
-interface Egreso {
-  id: number;
-  descripcion: string;
-  monto: number;
-  fecha: string;
-  categoria: string;
-}
 
 export default function EgresosPage() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [egresos, setEgresos] = useState<Egreso[]>([]);
-  const [cargando, setCargando] = useState(true);
+  const router = useRouter();
+  const [usuario, setUsuario] = useState<any>(null);
+  const [egresos, setEgresos] = useState<any[]>([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [formData, setFormData] = useState({
+  const [nuevoEgreso, setNuevoEgreso] = useState({
     descripcion: "",
     monto: "",
-    fecha: new Date().toISOString().split('T')[0],
-    categoria: "Alimentación"
+    categoria: "",
+    fecha: new Date().toISOString().split('T')[0]
   });
-  const [error, setError] = useState("");
-  const [exito, setExito] = useState("");
-  const router = useRouter();
+  const [egresoEditando, setEgresoEditando] = useState<number | null>(null);
+  const [datosEdicion, setDatosEdicion] = useState({
+    descripcion: "",
+    monto: "",
+    categoria: "",
+    fecha: ""
+  });
 
+  // Categorías predefinidas
   const categorias = [
+    "Ahorro e inversiones",
     "Alimentación",
-    "Transporte",
-    "Vivienda",
-    "Servicios",
-    "Salud",
+    "Créditos y préstamos",
     "Educación",
     "Entretenimiento",
+    "Otros",
     "Ropa",
+    "Salud",
+    "Servicios",
+    "Tarjeta de créditos",
     "Tecnología",
-    "Otro"
+    "Transporte",
+    "Vivienda"
   ];
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem('usuario');
-    
+    const usuarioGuardado = localStorage.getItem("usuario");
     if (!usuarioGuardado) {
-      router.push('/');
-      return;
+      router.push("/");
+    } else {
+      const user = JSON.parse(usuarioGuardado);
+      setUsuario(user);
     }
+  }, []);
 
-    const usuarioData = JSON.parse(usuarioGuardado);
-    setUsuario(usuarioData);
-    cargarEgresos(usuarioData.id);
-  }, [router]);
+  useEffect(() => {
+    if (usuario) {
+      cargarEgresos();
+    }
+  }, [usuario]);
 
-  const cargarEgresos = async (usuarioId: number) => {
+  const cargarEgresos = async () => {
+    if (!usuario) return;
+
     try {
-      const response = await fetch(`/api/egresos?usuarioId=${usuarioId}`);
-      const data = await response.json();
-      
+      const response = await fetch(`/api/egresos?usuarioId=${usuario.id}`);
       if (response.ok) {
-        setEgresos(data.egresos);
+        const data = await response.json();
+        setEgresos(data.egresos || data);
       }
     } catch (error) {
-      console.error('Error al cargar egresos:', error);
-    } finally {
-      setCargando(false);
+      console.error("Error al cargar egresos:", error);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const agregarEgreso = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setExito("");
-
-    if (!usuario) return;
-
-    if (!formData.descripcion || !formData.monto) {
-      setError("Descripción y monto son requeridos");
+    
+    if (!usuario) {
+      alert("Error: Usuario no encontrado");
       return;
     }
 
     try {
-      const response = await fetch('/api/egresos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/egresos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          usuarioId: usuario.id,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Error al crear egreso');
-        return;
-      }
-
-      setExito('¡Egreso agregado exitosamente!');
-      setFormData({
-        descripcion: "",
-        monto: "",
-        fecha: new Date().toISOString().split('T')[0],
-        categoria: "Alimentación"
-      });
-      setMostrarFormulario(false);
-      cargarEgresos(usuario.id);
-
-      setTimeout(() => setExito(""), 3000);
-    } catch (error) {
-      console.error('Error:', error);
-      setError('Error al procesar la solicitud');
-    }
-  };
-
-  const handleEliminar = async (id: number) => {
-    if (!usuario) return;
-    
-    if (!confirm('¿Estás seguro de eliminar este egreso?')) return;
-
-    try {
-      const response = await fetch(`/api/egresos?id=${id}&usuarioId=${usuario.id}`, {
-        method: 'DELETE',
+          descripcion: nuevoEgreso.descripcion,
+          monto: parseFloat(nuevoEgreso.monto),
+          categoria: nuevoEgreso.categoria,
+          fecha: nuevoEgreso.fecha,
+          usuarioId: usuario.id
+        })
       });
 
       if (response.ok) {
-        setExito('Egreso eliminado exitosamente');
-        cargarEgresos(usuario.id);
-        setTimeout(() => setExito(""), 3000);
+        setNuevoEgreso({
+          descripcion: "",
+          monto: "",
+          categoria: "",
+          fecha: new Date().toISOString().split('T')[0]
+        });
+        setMostrarFormulario(false);
+        cargarEgresos();
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error || 'No se pudo guardar el egreso'}`);
       }
     } catch (error) {
-      console.error('Error al eliminar:', error);
-      setError('Error al eliminar el egreso');
+      console.error("Error al agregar egreso:", error);
+      alert("Error al guardar el egreso");
     }
   };
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('usuario');
-    router.push('/');
+  const eliminarEgreso = async (id: number) => {
+    if (confirm("¿Estás seguro de eliminar este egreso?")) {
+      try {
+        const response = await fetch(`/api/egresos/${id}`, {
+          method: "DELETE"
+        });
+        if (response.ok) {
+          cargarEgresos();
+        }
+      } catch (error) {
+        console.error("Error al eliminar egreso:", error);
+      }
+    }
   };
 
-  const formatearMonto = (monto: number) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP'
-    }).format(monto);
-  };
-
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const iniciarEdicion = (egreso: any) => {
+    setEgresoEditando(egreso.id);
+    setDatosEdicion({
+      descripcion: egreso.descripcion,
+      monto: egreso.monto.toString(),
+      categoria: egreso.categoria || "",
+      fecha: egreso.fecha.split('T')[0]
     });
   };
 
-  if (!usuario || cargando) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
-        Cargando...
-      </div>
-    );
-  }
+  const guardarEdicion = async (id: number) => {
+    try {
+      const response = await fetch(`/api/egresos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          descripcion: datosEdicion.descripcion,
+          monto: parseFloat(datosEdicion.monto),
+          categoria: datosEdicion.categoria,
+          fecha: datosEdicion.fecha
+        })
+      });
 
-  const totalEgresos = egresos.reduce((sum, egr) => sum + Number(egr.monto), 0);
+      if (response.ok) {
+        setEgresoEditando(null);
+        cargarEgresos();
+      }
+    } catch (error) {
+      console.error('Error al actualizar egreso:', error);
+    }
+  };
+
+  const cancelarEdicion = () => {
+    setEgresoEditando(null);
+    setDatosEdicion({
+      descripcion: "",
+      monto: "",
+      categoria: "",
+      fecha: ""
+    });
+  };
+
+  const handleCerrarSesion = () => {
+    localStorage.removeItem("usuario");
+    router.push("/");
+  };
+
+  const totalEgresos = egresos.reduce((sum, egreso) => sum + egreso.monto, 0);
+
+  if (!usuario) return null;
 
   return (
-    <div style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      minHeight: "100vh",
-      backgroundColor: "#f5f5f5"
-    }}>
-      {/* Header */}
-      <header style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
-        <Link href="/dashboard">
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={120} 
-            height={120}
-            style={{ objectFit: "contain", cursor: "pointer" }}
-          />
-        </Link>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <div style={{ textAlign: "right" }}>
-            <p style={{ margin: 0, color: "black", fontWeight: "600", fontSize: "1rem" }}>
-              {usuario.nombres} {usuario.apellidos}
-            </p>
-            <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>
-              {usuario.correo}
-            </p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Navbar - Responsive */}
+      <nav className="bg-[#096266] text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💰</span>
+              <h1 className="text-xl font-bold">OrdenateYA</h1>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/dashboard" className="hover:text-gray-200 transition">
+                Vista General
+              </Link>
+              <Link href="/Ingresos" className="hover:text-gray-200 transition">
+                Ingresos
+              </Link>
+              <Link href="/egresos" className="font-bold border-b-2 border-white">
+                Egresos
+              </Link>
+              <Link href="/metas" className="hover:text-gray-200 transition">
+                Metas
+              </Link>
+              <Link href="/estadisticas" className="hover:text-gray-200 transition">
+                Estadísticas
+              </Link>
+              
+              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
+                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
+                <button
+                  onClick={handleCerrarSesion}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
+                >
+                  Salir
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2">
+              <span className="text-2xl">☰</span>
+            </button>
           </div>
-          <button
-            onClick={cerrarSesion}
-            style={{
-              padding: "0.6rem 1.2rem",
-              backgroundColor: "#e74c3c",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "0.9rem",
-              fontWeight: "500"
-            }}
-          >
-            Cerrar Sesión
-          </button>
         </div>
-      </header>
+      </nav>
 
-      {/* Navegación */}
-      <div style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-        display: "flex",
-        gap: "1rem"
-      }}>
-        <Link
-          href="/dashboard"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px",
-            transition: "background-color 0.2s"
-          }}
-        >
-          ← Dashboard
-        </Link>
-        <Link
-          href="/ingresos"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px",
-            transition: "background-color 0.2s"
-          }}
-        >
-          Ingresos
-        </Link>
-        <Link
-          href="/egresos"
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#f44336",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "4px",
-            fontWeight: "500"
-          }}
-        >
-          Egresos
-        </Link>
-      </div>
-
-      {/* Contenido principal */}
-      <main style={{ flex: 1, padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          {/* Encabezado */}
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "2rem"
-          }}>
-            <h1 style={{ color: "#2c3e50", margin: 0 }}>
-              📉 Mis Egresos
-            </h1>
+      {/* Main Content */}
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                💸 Mis Egresos
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Registra y controla tus gastos
+              </p>
+            </div>
+            
             <button
               onClick={() => setMostrarFormulario(!mostrarFormulario)}
-              style={{
-                padding: "0.75rem 1.5rem",
-                backgroundColor: "#f44336",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "500"
-              }}
+              className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition"
             >
-              {mostrarFormulario ? "✕ Cancelar" : "➕ Nuevo Egreso"}
+              {mostrarFormulario ? "Cancelar" : "Nuevo Egreso"}
             </button>
           </div>
 
-          {/* Mensajes */}
-          {error && (
-            <div style={{
-              backgroundColor: "#fee",
-              border: "1px solid #fcc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#c00"
-            }}>
-              {error}
-            </div>
-          )}
-
-          {exito && (
-            <div style={{
-              backgroundColor: "#efe",
-              border: "1px solid #cfc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#090"
-            }}>
-              {exito}
-            </div>
-          )}
+          {/* Resumen */}
+          <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-red-700 mb-2">
+              Total Egresos
+            </h3>
+            <p className="text-3xl sm:text-4xl font-bold text-red-600">
+              ${totalEgresos.toLocaleString('es-CL')}
+            </p>
+          </div>
 
           {/* Formulario */}
           {mostrarFormulario && (
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "2rem",
-              marginBottom: "2rem",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-            }}>
-              <h2 style={{ color: "#2c3e50", marginTop: 0 }}>Agregar Nuevo Egreso</h2>
-              <form onSubmit={handleSubmit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Registrar Nuevo Egreso
+              </h3>
+              
+              <form onSubmit={agregarEgreso}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Descripción *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Descripción
                     </label>
                     <input
                       type="text"
-                      value={formData.descripcion}
-                      onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                      placeholder="Ej: Compra en supermercado"
+                      value={nuevoEgreso.descripcion}
+                      onChange={(e) => setNuevoEgreso({...nuevoEgreso, descripcion: e.target.value})}
                       required
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="Ej: Supermercado"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Monto (CLP) *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Monto
                     </label>
                     <input
                       type="number"
-                      value={formData.monto}
-                      onChange={(e) => setFormData({...formData, monto: e.target.value})}
-                      placeholder="0"
+                      value={nuevoEgreso.monto}
+                      onChange={(e) => setNuevoEgreso({...nuevoEgreso, monto: e.target.value})}
                       required
-                      min="0"
-                      step="1"
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="0"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Categoría
                     </label>
                     <select
-                      value={formData.categoria}
-                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      value={nuevoEgreso.categoria}
+                      onChange={(e) => setNuevoEgreso({...nuevoEgreso, categoria: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:outline-none transition cursor-pointer"
                     >
-                      {categorias.map(cat => (
+                      <option value="">Selecciona una categoría</option>
+                      {categorias.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Fecha
                     </label>
                     <input
                       type="date"
-                      value={formData.fecha}
-                      onChange={(e) => setFormData({...formData, fecha: e.target.value})}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      value={nuevoEgreso.fecha}
+                      onChange={(e) => setNuevoEgreso({...nuevoEgreso, fecha: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  style={{
-                    padding: "0.75rem 2rem",
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                    fontWeight: "500"
-                  }}
+                  className="w-full sm:w-auto px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition"
                 >
                   Guardar Egreso
                 </button>
@@ -454,103 +334,132 @@ export default function EgresosPage() {
             </div>
           )}
 
-          {/* Resumen */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            marginBottom: "2rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            border: "2px solid #f44336"
-          }}>
-            <h3 style={{ margin: "0 0 1rem 0", color: "#2c3e50" }}>Resumen</h3>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Total de Egresos</p>
-                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#f44336" }}>
-                  {formatearMonto(totalEgresos)}
-                </p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Cantidad de Registros</p>
-                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#2c3e50" }}>
-                  {egresos.length}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Lista de Egresos */}
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">
+              Lista de Egresos
+            </h3>
 
-          {/* Lista de egresos */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-          }}>
-            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>Historial</h3>
-            
             {egresos.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "3rem", color: "#999" }}>
-                <p style={{ fontSize: "3rem", margin: 0 }}>📊</p>
-                <p style={{ fontSize: "1.1rem", margin: "1rem 0 0 0" }}>
-                  No hay egresos registrados
-                </p>
-                <p style={{ fontSize: "0.9rem", margin: "0.5rem 0 0 0" }}>
-                  Agrega tu primer egreso usando el botón de arriba
-                </p>
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-5xl mb-4">📭</p>
+                <p className="text-xl font-medium mb-2">No hay egresos registrados</p>
+                <p>Comienza agregando tu primer gasto</p>
               </div>
             ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <table className="w-full min-w-[640px]">
                   <thead>
-                    <tr style={{ borderBottom: "2px solid #e0e0e0" }}>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Fecha</th>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Descripción</th>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Categoría</th>
-                      <th style={{ padding: "1rem", textAlign: "right", color: "#666", fontWeight: "600" }}>Monto</th>
-                      <th style={{ padding: "1rem", textAlign: "center", color: "#666", fontWeight: "600" }}>Acciones</th>
+                    <tr className="bg-gray-100 border-b-2 border-gray-200">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Descripción
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Monto
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Categoría
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Fecha
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                        Acciones
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {egresos.map((egreso) => (
-                      <tr key={egreso.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                        <td style={{ padding: "1rem", color: "#666" }}>
-                          {formatearFecha(egreso.fecha)}
-                        </td>
-                        <td style={{ padding: "1rem", color: "#2c3e50", fontWeight: "500" }}>
-                          {egreso.descripcion}
-                        </td>
-                        <td style={{ padding: "1rem" }}>
-                          <span style={{
-                            padding: "0.25rem 0.75rem",
-                            backgroundColor: "#ffebee",
-                            color: "#c62828",
-                            borderRadius: "12px",
-                            fontSize: "0.85rem",
-                            fontWeight: "500"
-                          }}>
-                            {egreso.categoria}
-                          </span>
-                        </td>
-                        <td style={{ padding: "1rem", textAlign: "right", color: "#f44336", fontWeight: "600", fontSize: "1.1rem" }}>
-                          {formatearMonto(Number(egreso.monto))}
-                        </td>
-                        <td style={{ padding: "1rem", textAlign: "center" }}>
-                          <button
-                            onClick={() => handleEliminar(egreso.id)}
-                            style={{
-                              padding: "0.5rem 1rem",
-                              backgroundColor: "#f44336",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                              fontSize: "0.85rem"
-                            }}
-                          >
-                            🗑️ Eliminar
-                          </button>
-                        </td>
+                      <tr key={egreso.id} className="border-b border-gray-200 hover:bg-gray-50 transition">
+                        {egresoEditando === egreso.id ? (
+                          // Modo edición
+                          <>
+                            <td className="px-4 py-3">
+                              <input
+                                type="text"
+                                value={datosEdicion.descripcion}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <input
+                                type="number"
+                                value={datosEdicion.monto}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, monto: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <select
+                                value={datosEdicion.categoria}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, categoria: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none cursor-pointer"
+                              >
+                                <option value="">Selecciona categoría</option>
+                                {categorias.map((cat) => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="px-4 py-3">
+                              <input
+                                type="date"
+                                value={datosEdicion.fecha}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, fecha: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                <button
+                                  onClick={() => guardarEdicion(egreso.id)}
+                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Guardar
+                                </button>
+                                <button
+                                  onClick={cancelarEdicion}
+                                  className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          // Modo visualización
+                          <>
+                            <td className="px-4 py-3 text-gray-800">
+                              {egreso.descripcion}
+                            </td>
+                            <td className="px-4 py-3 text-red-600 font-semibold">
+                              ${egreso.monto.toLocaleString('es-CL')}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {egreso.categoria || "Sin categoría"}
+                            </td>
+                            <td className="px-4 py-3 text-gray-500">
+                              {new Date(egreso.fecha).toLocaleDateString('es-CL')}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                <button
+                                  onClick={() => iniciarEdicion(egreso)}
+                                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => eliminarEgreso(egreso.id)}
+                                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -562,16 +471,8 @@ export default function EgresosPage() {
       </main>
 
       {/* Footer */}
-      <footer style={{
-        backgroundColor: "#2c3e50",
-        color: "white",
-        padding: "2rem",
-        textAlign: "center"
-      }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
-          Gestión financiera personal
-        </p>
+      <footer className="bg-[#096266] text-white text-center py-6 mt-auto">
+        <p>© 2024 OrdenateYA - Gestión de Finanzas Personales</p>
       </footer>
     </div>
   );
