@@ -69,15 +69,21 @@ export default function RegistroPage() {
     setCargando(true);
 
     try {
+      // Enviar con los nombres de campos que espera la API
+      const datosRegistro = {
+        nombres: formData.nombres.trim(),
+        apellidos: formData.apellidos.trim(),
+        correo: formData.correo.trim(),
+        password: formData.password,
+        telefono: formData.telefono.trim(),
+      };
+
+      console.log('Datos a enviar:', datosRegistro);
+
       const response = await fetch("/api/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre: `${formData.nombres} ${formData.apellidos}`,
-          email: formData.correo,
-          password: formData.password,
-          telefono: formData.telefono,
-        }),
+        body: JSON.stringify(datosRegistro),
       });
 
       const data = await response.json();
@@ -102,30 +108,16 @@ export default function RegistroPage() {
 
   if (exitoso) {
     return (
-      <div style={{ 
-        display: "flex", 
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f5",
-        alignItems: "center",
-        justifyContent: "center"
-      }}>
-        <div style={{
-          maxWidth: "500px",
-          width: "100%",
-          padding: "3rem",
-          backgroundColor: "#fff",
-          borderRadius: "12px",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-          textAlign: "center"
-        }}>
-          <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>✅</div>
-          <h2 style={{ color: "#4CAF50", marginBottom: "1rem", fontSize: "1.8rem" }}>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="text-6xl mb-4">✅</div>
+          <h2 className="text-2xl font-bold text-green-600 mb-3">
             ¡Registro Exitoso!
           </h2>
-          <p style={{ color: "#666", marginBottom: "1.5rem" }}>
+          <p className="text-gray-600 mb-4">
             Se ha enviado un correo de confirmación a <strong>{formData.correo}</strong>
           </p>
-          <p style={{ color: "#999", fontSize: "0.9rem" }}>
+          <p className="text-sm text-gray-500">
             Serás redirigido al inicio de sesión en unos segundos...
           </p>
         </div>
@@ -134,113 +126,49 @@ export default function RegistroPage() {
   }
 
   return (
-    <div style={{ 
-      display: "flex", 
-      minHeight: "100vh",
-      backgroundColor: "#f5f5f5"
-    }}>
-      {/* Panel izquierdo - Imagen */}
-      <div style={{
-        flex: 1,
-        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        position: "relative",
-        overflow: "hidden"
-      }}>
-        <div style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          opacity: 0.1,
-          backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)"
-        }}></div>
+    <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
+      {/* Panel izquierdo - Oculto en móvil, visible en desktop */}
+      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-[#04474B] to-[#096266] items-center justify-center p-8 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: "url(data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E)"
+          }}
+        />
         
-        <div style={{ 
-          zIndex: 1, 
-          textAlign: "center",
-          color: "white"
-        }}>
-          <div style={{ 
-            fontSize: "4rem", 
-            marginBottom: "1rem",
-            animation: "float 3s ease-in-out infinite"
-          }}>
-            💰
-          </div>
-          <h1 style={{ 
-            fontSize: "2.5rem", 
-            marginBottom: "1rem",
-            fontWeight: "700"
-          }}>
+        <div className="z-10 text-center text-white">
+          <div className="text-6xl mb-4 animate-bounce">💰</div>
+          <h1 className="text-4xl font-bold mb-4">
             ¡Únete a OrdenateYA!
           </h1>
-          <p style={{ 
-            fontSize: "1.2rem", 
-            opacity: 0.9,
-            maxWidth: "400px",
-            lineHeight: "1.6",
-            margin: "0 auto"  
-          }}>
+          <p className="text-lg opacity-90 max-w-md mx-auto leading-relaxed">
             Crea tu cuenta y comienza a gestionar tus finanzas de manera inteligente
           </p>
         </div>
       </div>
 
-      {/* Panel derecho - Formulario de Registro */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        overflowY: "auto"
-      }}>
-        <div style={{
-          width: "100%",
-          maxWidth: "450px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          padding: "3rem",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.1)"
-        }}>
-          <h2 style={{
-            textAlign: "center",
-            color: "#2c3e50",
-            marginBottom: "0.5rem",
-            fontSize: "1.8rem"
-          }}>
+      {/* Panel derecho - Formulario (Siempre visible) */}
+      <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 sm:p-8">
+          {/* Título móvil */}
+          <div className="lg:hidden text-center mb-6">
+            <div className="text-4xl mb-2">💰</div>
+            <h1 className="text-2xl font-bold text-gray-800">OrdenateYA</h1>
+          </div>
+
+          <h2 className="text-center text-2xl font-bold text-gray-800 mb-2">
             Crear Cuenta
           </h2>
 
-          <p style={{
-            textAlign: "center",
-            color: "#666",
-            marginBottom: "2rem",
-            fontSize: "0.95rem"
-          }}>
+          <p className="text-center text-gray-600 mb-6 text-sm">
             Completa tus datos para registrarte
           </p>
 
           {/* Mensajes de error */}
           {errores.length > 0 && (
-            <div style={{
-              backgroundColor: "#fee",
-              border: "1px solid #fcc",
-              borderRadius: "8px",
-              padding: "1rem",
-              marginBottom: "1rem"
-            }}>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               {errores.map((error, index) => (
-                <p key={index} style={{
-                  color: "#c00",
-                  fontSize: "0.9rem",
-                  margin: "0.25rem 0"
-                }}>
+                <p key={index} className="text-red-700 text-sm mb-1">
                   • {error}
                 </p>
               ))}
@@ -248,16 +176,10 @@ export default function RegistroPage() {
           )}
 
           {/* Formulario */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nombres */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Nombres
               </label>
               <input
@@ -268,29 +190,13 @@ export default function RegistroPage() {
                 placeholder="Ingresa tus nombres"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Apellidos */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Apellidos
               </label>
               <input
@@ -301,29 +207,13 @@ export default function RegistroPage() {
                 placeholder="Ingresa tus apellidos"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Correo */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Correo Electrónico
               </label>
               <input
@@ -334,29 +224,13 @@ export default function RegistroPage() {
                 placeholder="tu@ejemplo.com"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Teléfono */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Teléfono
               </label>
               <input
@@ -367,29 +241,13 @@ export default function RegistroPage() {
                 placeholder="+56912345678"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Contraseña */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Contraseña
               </label>
               <input
@@ -400,29 +258,13 @@ export default function RegistroPage() {
                 placeholder="Mínimo 6 caracteres"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Confirmar Contraseña */}
-            <div style={{ marginBottom: "1.25rem" }}>
-              <label style={{
-                display: "block",
-                marginBottom: "0.5rem",
-                color: "#2c3e50",
-                fontWeight: "500",
-                fontSize: "0.95rem"
-              }}>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirmar Contraseña
               </label>
               <input
@@ -433,54 +275,28 @@ export default function RegistroPage() {
                 placeholder="Repite tu contraseña"
                 required
                 disabled={cargando}
-                style={{
-                  width: "100%",
-                  padding: "0.875rem",
-                  border: "2px solid #e0e0e0",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                  transition: "border-color 0.3s",
-                  boxSizing: "border-box"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#667eea"}
-                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition disabled:bg-gray-100"
               />
             </div>
 
             {/* Términos y Condiciones */}
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label style={{
-                display: "flex",
-                alignItems: "flex-start",
-                cursor: "pointer",
-                fontSize: "0.9rem",
-                color: "#666"
-              }}>
-                <input
-                  type="checkbox"
-                  name="aceptaTerminos"
-                  checked={formData.aceptaTerminos}
-                  onChange={handleChange}
-                  disabled={cargando}
-                  style={{
-                    marginRight: "0.5rem",
-                    marginTop: "0.25rem",
-                    cursor: "pointer"
-                  }}
-                />
-                <span>
-                  Acepto los{" "}
-                  <Link
-                    href="/terminos"
-                    style={{
-                      color: "#667eea",
-                      textDecoration: "none",
-                      fontWeight: "500"
-                    }}
-                  >
-                    términos y condiciones
-                  </Link>
-                </span>
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                name="aceptaTerminos"
+                checked={formData.aceptaTerminos}
+                onChange={handleChange}
+                disabled={cargando}
+                className="mt-1 mr-2 cursor-pointer"
+              />
+              <label className="text-sm text-gray-600 cursor-pointer">
+                Acepto los{" "}
+                <Link
+                  href="/terminos"
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  términos y condiciones
+                </Link>
               </label>
             </div>
 
@@ -488,68 +304,33 @@ export default function RegistroPage() {
             <button
               type="submit"
               disabled={cargando}
-              style={{
-                width: "100%",
-                padding: "1rem",
-                backgroundColor: cargando ? "#ccc" : "#096266",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "1.1rem",
-                fontWeight: "600",
-                cursor: cargando ? "not-allowed" : "pointer",
-                transition: "background-color 0.3s",
-                marginBottom: "1rem"
-              }}
-              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#04474b")}
-              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#096266")}
+              className="w-full bg-[#096266] hover:bg-[#04474b] text-white font-semibold py-3 rounded-lg transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {cargando ? "Registrando..." : "Crear Cuenta"}
             </button>
           </form>
 
           {/* Separador */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            margin: "1.5rem 0",
-            gap: "1rem"
-          }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
-            <span style={{ color: "#999", fontSize: "0.9rem" }}>o</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#e0e0e0" }}></div>
+          <div className="flex items-center my-6">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-3 text-gray-500 text-sm">o</span>
+            <div className="flex-1 border-t border-gray-300"></div>
           </div>
 
-          {/* Enlace a Login */}
-          <div style={{ textAlign: "center" }}>
-            <p style={{ color: "#666", marginBottom: "0.5rem", fontSize: "0.95rem" }}>
+          {/* Link a Login */}
+          <div className="text-center">
+            <p className="text-gray-600 text-sm mb-2">
               ¿Ya tienes una cuenta?
             </p>
             <Link
               href="/"
-              style={{
-                color: "#667eea",
-                textDecoration: "none",
-                fontSize: "1rem",
-                fontWeight: "600"
-              }}
+              className="text-blue-600 hover:text-blue-700 font-semibold text-sm hover:underline"
             >
               Inicia sesión aquí
             </Link>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-      `}</style>
     </div>
   );
 }
