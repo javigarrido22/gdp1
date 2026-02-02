@@ -3,811 +3,485 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-
-interface Usuario {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  correo: string;
-}
-
-interface Meta {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  montoObjetivo: number;
-  montoActual: number;
-  fechaInicio: string;
-  fechaLimite: string;
-  categoria: string;
-  completada: boolean;
-}
 
 export default function MetasPage() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [metas, setMetas] = useState<Meta[]>([]);
-  const [cargando, setCargando] = useState(true);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [formData, setFormData] = useState({
-    nombre: "",
-    descripcion: "",
-    montoObjetivo: "",
-    fechaLimite: "",
-    categoria: "Ahorro"
-  });
-  const [error, setError] = useState("");
-  const [exito, setExito] = useState("");
   const router = useRouter();
-
-  const categorias = [
-    "Ahorro",
-    "Viaje",
-    "Compra",
-    "Inversión",
-    "Educación",
-    "Hogar",
-    "Emergencia",
-    "Otro"
-  ];
+  const [usuario, setUsuario] = useState<any>(null);
+  const [metas, setMetas] = useState<any[]>([]);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [nuevaMeta, setNuevaMeta] = useState({
+    titulo: "",
+    montoObjetivo: "",
+    montoActual: "",
+    fechaLimite: ""
+  });
+  const [metaEditando, setMetaEditando] = useState<number | null>(null);
+  const [datosEdicion, setDatosEdicion] = useState({
+    titulo: "",
+    montoObjetivo: "",
+    montoActual: "",
+    fechaLimite: ""
+  });
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem('usuario');
-    
+    const usuarioGuardado = localStorage.getItem("usuario");
     if (!usuarioGuardado) {
-      router.push('/');
-      return;
+      router.push("/");
+    } else {
+      const user = JSON.parse(usuarioGuardado);
+      setUsuario(user);
     }
+  }, []);
 
-    const usuarioData = JSON.parse(usuarioGuardado);
-    setUsuario(usuarioData);
-    cargarMetas(usuarioData.id);
-  }, [router]);
+  useEffect(() => {
+    if (usuario) {
+      cargarMetas();
+    }
+  }, [usuario]);
 
-  const cargarMetas = async (usuarioId: number) => {
+  const cargarMetas = async () => {
+    if (!usuario) return;
+
     try {
-      const response = await fetch(`/api/metas?usuarioId=${usuarioId}`);
-      const data = await response.json();
-      
+      const response = await fetch(`/api/metas?usuarioId=${usuario.id}`);
       if (response.ok) {
-        setMetas(data.metas);
+        const data = await response.json();
+        setMetas(data.metas || data);
       }
     } catch (error) {
-      console.error('Error al cargar metas:', error);
-    } finally {
-      setCargando(false);
+      console.error("Error al cargar metas:", error);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const agregarMeta = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setExito("");
-
-    if (!usuario) return;
-
-    if (!formData.nombre || !formData.montoObjetivo || !formData.fechaLimite) {
-      setError("Nombre, monto objetivo y fecha límite son requeridos");
+    
+    if (!usuario) {
+      alert("Error: Usuario no encontrado");
       return;
     }
 
     try {
-      const response = await fetch('/api/metas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/metas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          usuarioId: usuario.id,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Error al crear meta');
-        return;
-      }
-
-      setExito('¡Meta creada exitosamente!');
-      setFormData({
-        nombre: "",
-        descripcion: "",
-        montoObjetivo: "",
-        fechaLimite: "",
-        categoria: "Ahorro"
-      });
-      setMostrarFormulario(false);
-      cargarMetas(usuario.id);
-
-      setTimeout(() => setExito(""), 3000);
-    } catch (error) {
-      console.error('Error:', error);
-      setError('Error al procesar la solicitud');
-    }
-  };
-
-  const handleAgregarMonto = async (metaId: number, montoActual: number, montoObjetivo: number) => {
-    if (!usuario) return;
-
-    const montoAgregar = prompt('¿Cuánto deseas agregar a esta meta?');
-    if (!montoAgregar || isNaN(Number(montoAgregar))) return;
-
-    const nuevoMonto = montoActual + Number(montoAgregar);
-    const completada = nuevoMonto >= montoObjetivo;
-
-    try {
-      const response = await fetch('/api/metas', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: metaId,
-          montoActual: nuevoMonto,
-          completada,
-          usuarioId: usuario.id,
-        }),
+          titulo: nuevaMeta.titulo,
+          montoObjetivo: parseFloat(nuevaMeta.montoObjetivo),
+          montoActual: parseFloat(nuevaMeta.montoActual || "0"),
+          fechaLimite: nuevaMeta.fechaLimite || null,
+          usuarioId: usuario.id
+        })
       });
 
       if (response.ok) {
-        setExito(completada ? '¡Felicitaciones! Meta completada 🎉' : 'Monto agregado exitosamente');
-        cargarMetas(usuario.id);
-        setTimeout(() => setExito(""), 3000);
+        setNuevaMeta({
+          titulo: "",
+          montoObjetivo: "",
+          montoActual: "",
+          fechaLimite: ""
+        });
+        setMostrarFormulario(false);
+        cargarMetas();
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error || 'No se pudo guardar la meta'}`);
       }
     } catch (error) {
-      console.error('Error al actualizar meta:', error);
-      setError('Error al actualizar la meta');
+      console.error("Error al agregar meta:", error);
+      alert("Error al guardar la meta");
     }
   };
 
-  const handleEliminar = async (id: number) => {
-    if (!usuario) return;
-    
-    if (!confirm('¿Estás seguro de eliminar esta meta?')) return;
-
-    try {
-      const response = await fetch(`/api/metas?id=${id}&usuarioId=${usuario.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setExito('Meta eliminada exitosamente');
-        cargarMetas(usuario.id);
-        setTimeout(() => setExito(""), 3000);
+  const eliminarMeta = async (id: number) => {
+    if (confirm("¿Estás seguro de eliminar esta meta?")) {
+      try {
+        const response = await fetch(`/api/metas/${id}`, {
+          method: "DELETE"
+        });
+        if (response.ok) {
+          cargarMetas();
+        }
+      } catch (error) {
+        console.error("Error al eliminar meta:", error);
       }
-    } catch (error) {
-      console.error('Error al eliminar:', error);
-      setError('Error al eliminar la meta');
     }
   };
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('usuario');
-    router.push('/');
-  };
-
-  const formatearMonto = (monto: number) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP'
-    }).format(monto);
-  };
-
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const iniciarEdicion = (meta: any) => {
+    setMetaEditando(meta.id);
+    setDatosEdicion({
+      titulo: meta.titulo,
+      montoObjetivo: meta.montoObjetivo.toString(),
+      montoActual: meta.montoActual.toString(),
+      fechaLimite: meta.fechaLimite ? meta.fechaLimite.split('T')[0] : ""
     });
   };
 
-  const calcularProgreso = (actual: number, objetivo: number) => {
-    return Math.min((actual / objetivo) * 100, 100);
+  const guardarEdicion = async (id: number) => {
+    try {
+      const response = await fetch(`/api/metas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: datosEdicion.titulo,
+          montoObjetivo: parseFloat(datosEdicion.montoObjetivo),
+          montoActual: parseFloat(datosEdicion.montoActual),
+          fechaLimite: datosEdicion.fechaLimite || null
+        })
+      });
+
+      if (response.ok) {
+        setMetaEditando(null);
+        cargarMetas();
+      }
+    } catch (error) {
+      console.error('Error al actualizar meta:', error);
+    }
   };
 
-  const diasRestantes = (fechaLimite: string) => {
-    const hoy = new Date();
-    const limite = new Date(fechaLimite);
-    const diferencia = limite.getTime() - hoy.getTime();
-    const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-    return dias;
+  const cancelarEdicion = () => {
+    setMetaEditando(null);
+    setDatosEdicion({
+      titulo: "",
+      montoObjetivo: "",
+      montoActual: "",
+      fechaLimite: ""
+    });
   };
 
-  if (!usuario || cargando) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
-        Cargando...
-      </div>
-    );
-  }
+  const marcarCompletada = async (id: number) => {
+    try {
+      const response = await fetch(`/api/metas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completada: true })
+      });
 
-  const metasActivas = metas.filter(m => !m.completada);
-  const metasCompletadas = metas.filter(m => m.completada);
+      if (response.ok) {
+        cargarMetas();
+      }
+    } catch (error) {
+      console.error('Error al marcar meta como completada:', error);
+    }
+  };
+
+  const handleCerrarSesion = () => {
+    localStorage.removeItem("usuario");
+    router.push("/");
+  };
+
+  const calcularProgreso = (montoActual: number, montoObjetivo: number) => {
+    return Math.min((montoActual / montoObjetivo) * 100, 100);
+  };
+
+  if (!usuario) return null;
 
   return (
-    <div style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      minHeight: "100vh",
-      backgroundColor: "#f5f5f5"
-    }}>
-      {/* Header */}
-      <header style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
-        <Link href="/dashboard">
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={120} 
-            height={120}
-            style={{ objectFit: "contain", cursor: "pointer" }}
-          />
-        </Link>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <div style={{ textAlign: "right" }}>
-            <p style={{ margin: 0, color: "black", fontWeight: "600", fontSize: "1rem" }}>
-              {usuario.nombres} {usuario.apellidos}
-            </p>
-            <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>
-              {usuario.correo}
-            </p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Navbar - Responsive */}
+      <nav className="bg-[#096266] text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💰</span>
+              <h1 className="text-xl font-bold">OrdenateYA</h1>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/dashboard" className="hover:text-gray-200 transition">
+                ← Vista general
+              </Link>
+              <Link href="/ingresos" className="hover:text-gray-200 transition">
+                Ingresos
+              </Link>
+              <Link href="/egresos" className="hover:text-gray-200 transition">
+                Egresos
+              </Link>
+              <Link href="/metas" className="font-bold border-b-2 border-white">
+                Metas
+              </Link>
+              <Link href="/estadisticas" className="hover:text-gray-200 transition">
+                Estadísticas
+              </Link>
+              
+              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
+                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
+                <button
+                  onClick={handleCerrarSesion}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
+                >
+                  Salir
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2">
+              <span className="text-2xl">☰</span>
+            </button>
           </div>
-          <button
-            onClick={cerrarSesion}
-            style={{
-              padding: "0.6rem 1.2rem",
-              backgroundColor: "#e74c3c",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "0.9rem",
-              fontWeight: "500"
-            }}
-          >
-            Cerrar Sesión
-          </button>
         </div>
-      </header>
+      </nav>
 
-      {/* Navegación */}
-      <div style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-        display: "flex",
-        gap: "1rem"
-      }}>
-        <Link
-          href="/dashboard"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px"
-          }}
-        >
-          ← Vista general
-        </Link>
-        <Link
-          href="/ingresos"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px"
-          }}
-        >
-          Ingresos
-        </Link>
-        <Link
-          href="/egresos"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px"
-          }}
-        >
-          Egresos
-        </Link>
-        <Link
-          href="/estadisticas"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px"
-          }}
-        >
-          Estadísticas
-        </Link>
-        <Link
-          href="/metas"
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#ff9800",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "4px",
-            fontWeight: "500"
-          }}
-        >
-          Metas
-        </Link>
-      </div>
-
-      {/* Contenido principal */}
-      <main style={{ flex: 1, padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          {/* Encabezado */}
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "2rem"
-          }}>
-            <h1 style={{ color: "#2c3e50", margin: 0 }}>
-              🎯 Mis Metas Financieras
-            </h1>
+      {/* Main Content */}
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                🎯 Mis Metas
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Define y alcanza tus objetivos financieros
+              </p>
+            </div>
+            
             <button
               onClick={() => setMostrarFormulario(!mostrarFormulario)}
-              style={{
-                padding: "0.75rem 1.5rem",
-                backgroundColor: "#ff9800",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "500"
-              }}
+              className="w-full sm:w-auto px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md transition"
             >
-              {mostrarFormulario ? "✕ Cancelar" : "➕ Nueva Meta"}
+              {mostrarFormulario ? "Cancelar" : "➕ Nueva Meta"}
             </button>
           </div>
 
-          {/* Mensajes */}
-          {error && (
-            <div style={{
-              backgroundColor: "#fee",
-              border: "1px solid #fcc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#c00"
-            }}>
-              {error}
-            </div>
-          )}
-
-          {exito && (
-            <div style={{
-              backgroundColor: "#efe",
-              border: "1px solid #cfc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#090"
-            }}>
-              {exito}
-            </div>
-          )}
-
           {/* Formulario */}
           {mostrarFormulario && (
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "2rem",
-              marginBottom: "2rem",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-            }}>
-              <h2 style={{ color: "#2c3e50", marginTop: 0 }}>Crear Nueva Meta</h2>
-              <form onSubmit={handleSubmit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Crear Nueva Meta
+              </h3>
+              
+              <form onSubmit={agregarMeta}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Nombre de la Meta *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Título de la Meta
                     </label>
                     <input
                       type="text"
-                      value={formData.nombre}
-                      onChange={(e) => setFormData({...formData, nombre: e.target.value})}
-                      placeholder="Ej: Vacaciones 2025"
+                      value={nuevaMeta.titulo}
+                      onChange={(e) => setNuevaMeta({...nuevaMeta, titulo: e.target.value})}
                       required
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="Ej: Comprar un auto"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Categoría
-                    </label>
-                    <select
-                      value={formData.categoria}
-                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
-                    >
-                      {categorias.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Monto Objetivo (CLP) *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Monto Objetivo
                     </label>
                     <input
                       type="number"
-                      value={formData.montoObjetivo}
-                      onChange={(e) => setFormData({...formData, montoObjetivo: e.target.value})}
-                      placeholder="0"
+                      value={nuevaMeta.montoObjetivo}
+                      onChange={(e) => setNuevaMeta({...nuevaMeta, montoObjetivo: e.target.value})}
                       required
-                      min="0"
-                      step="1000"
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="0"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Fecha Límite *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Monto Actual (opcional)
                     </label>
                     <input
-                      type="date"
-                      value={formData.fechaLimite}
-                      onChange={(e) => setFormData({...formData, fechaLimite: e.target.value})}
-                      min={new Date().toISOString().split('T')[0]}
-                      required
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      type="number"
+                      value={nuevaMeta.montoActual}
+                      onChange={(e) => setNuevaMeta({...nuevaMeta, montoActual: e.target.value})}
+                      placeholder="0"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition"
                     />
                   </div>
 
-                  <div style={{ gridColumn: "1 / -1" }}>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Descripción (Opcional)
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Fecha Límite (opcional)
                     </label>
-                    <textarea
-                      value={formData.descripcion}
-                      onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                      placeholder="Describe tu meta..."
-                      rows={3}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box",
-                        resize: "vertical"
-                      }}
+                    <input
+                      type="date"
+                      value={nuevaMeta.fechaLimite}
+                      onChange={(e) => setNuevaMeta({...nuevaMeta, fechaLimite: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  style={{
-                    padding: "0.75rem 2rem",
-                    backgroundColor: "#ff9800",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                    fontWeight: "500"
-                  }}
+                  className="w-full sm:w-auto px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg shadow-md transition"
                 >
-                  Crear Meta
+                  Guardar Meta
                 </button>
               </form>
             </div>
           )}
 
-          {/* Metas Activas */}
-          <div style={{ marginBottom: "2rem" }}>
-            <h2 style={{ color: "#2c3e50", marginBottom: "1rem" }}>
-              Metas en Progreso ({metasActivas.length})
-            </h2>
-            
-            {metasActivas.length === 0 ? (
-              <div style={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "3rem",
-                textAlign: "center",
-                color: "#999",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-              }}>
-                <p style={{ fontSize: "3rem", margin: 0 }}>🎯</p>
-                <p style={{ fontSize: "1.1rem", margin: "1rem 0 0 0" }}>
-                  No tienes metas activas
-                </p>
-                <p style={{ fontSize: "0.9rem", margin: "0.5rem 0 0 0" }}>
-                  Crea tu primera meta usando el botón de arriba
-                </p>
+          {/* Lista de Metas */}
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">
+              Mis Metas de Ahorro
+            </h3>
+
+            {metas.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-5xl mb-4">🎯</p>
+                <p className="text-xl font-medium mb-2">No hay metas registradas</p>
+                <p>Comienza creando tu primera meta financiera</p>
               </div>
             ) : (
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-                gap: "1.5rem"
-              }}>
-                {metasActivas.map((meta) => {
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {metas.map((meta) => {
                   const progreso = calcularProgreso(meta.montoActual, meta.montoObjetivo);
-                  const dias = diasRestantes(meta.fechaLimite);
-                  
+                  const completada = meta.completada || progreso >= 100;
+
                   return (
-                    <div key={meta.id} style={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
-                      padding: "1.5rem",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                      border: "2px solid #ff9800"
-                    }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "1rem" }}>
-                        <div style={{ flex: 1 }}>
-                          <h3 style={{ margin: "0 0 0.5rem 0", color: "#2c3e50", fontSize: "1.2rem" }}>
-                            {meta.nombre}
-                          </h3>
-                          <span style={{
-                            padding: "0.25rem 0.75rem",
-                            backgroundColor: "#fff3e0",
-                            color: "#e65100",
-                            borderRadius: "12px",
-                            fontSize: "0.75rem",
-                            fontWeight: "500"
-                          }}>
-                            {meta.categoria}
-                          </span>
+                    <div
+                      key={meta.id}
+                      className={`border-2 rounded-xl p-6 transition ${
+                        completada
+                          ? 'border-green-400 bg-green-50'
+                          : 'border-gray-200 bg-white hover:shadow-lg'
+                      }`}
+                    >
+                      {metaEditando === meta.id ? (
+                        // Modo edición
+                        <div className="space-y-4">
+                          <input
+                            type="text"
+                            value={datosEdicion.titulo}
+                            onChange={(e) => setDatosEdicion({...datosEdicion, titulo: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                            placeholder="Título"
+                          />
+                          <input
+                            type="number"
+                            value={datosEdicion.montoObjetivo}
+                            onChange={(e) => setDatosEdicion({...datosEdicion, montoObjetivo: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                            placeholder="Monto Objetivo"
+                          />
+                          <input
+                            type="number"
+                            value={datosEdicion.montoActual}
+                            onChange={(e) => setDatosEdicion({...datosEdicion, montoActual: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                            placeholder="Monto Actual"
+                          />
+                          <input
+                            type="date"
+                            value={datosEdicion.fechaLimite}
+                            onChange={(e) => setDatosEdicion({...datosEdicion, fechaLimite: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => guardarEdicion(meta.id)}
+                              className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
+                            >
+                              Guardar
+                            </button>
+                            <button
+                              onClick={cancelarEdicion}
+                              className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        // Modo visualización
+                        <>
+                          <div className="flex justify-between items-start mb-4">
+                            <h4 className="text-lg font-bold text-gray-800">
+                              {meta.titulo}
+                            </h4>
+                            {completada && (
+                              <span className="text-2xl">✅</span>
+                            )}
+                          </div>
 
-                      {meta.descripcion && (
-                        <p style={{ color: "#666", fontSize: "0.9rem", margin: "0.5rem 0 1rem 0" }}>
-                          {meta.descripcion}
-                        </p>
+                          <div className="space-y-3 mb-4">
+                            <div>
+                              <p className="text-sm text-gray-600">Progreso</p>
+                              <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                                <div
+                                  className={`h-3 rounded-full transition-all ${
+                                    completada ? 'bg-green-500' : 'bg-purple-600'
+                                  }`}
+                                  style={{ width: `${progreso}%` }}
+                                ></div>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {progreso.toFixed(1)}% completado
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-sm text-gray-600">Monto Actual</p>
+                              <p className="text-xl font-bold text-purple-600">
+                                ${meta.montoActual.toLocaleString('es-CL')}
+                              </p>
+                            </div>
+
+                            <div>
+                              <p className="text-sm text-gray-600">Monto Objetivo</p>
+                              <p className="text-lg font-semibold text-gray-700">
+                                ${meta.montoObjetivo.toLocaleString('es-CL')}
+                              </p>
+                            </div>
+
+                            {meta.fechaLimite && (
+                              <div>
+                                <p className="text-sm text-gray-600">Fecha Límite</p>
+                                <p className="text-sm text-gray-700">
+                                  {new Date(meta.fechaLimite).toLocaleDateString('es-CL')}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-2">
+                            {!completada && (
+                              <button
+                                onClick={() => marcarCompletada(meta.id)}
+                                className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
+                              >
+                                Marcar Completada
+                              </button>
+                            )}
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => iniciarEdicion(meta)}
+                                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
+                              >
+                                Editar
+                              </button>
+                              <button
+                                onClick={() => eliminarMeta(meta.id)}
+                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition"
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        </>
                       )}
-
-                      <div style={{ marginBottom: "1rem" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                          <span style={{ fontSize: "0.9rem", color: "#666" }}>Progreso</span>
-                          <span style={{ fontSize: "0.9rem", fontWeight: "600", color: "#ff9800" }}>
-                            {progreso.toFixed(1)}%
-                          </span>
-                        </div>
-                        <div style={{
-                          width: "100%",
-                          height: "8px",
-                          backgroundColor: "#e0e0e0",
-                          borderRadius: "4px",
-                          overflow: "hidden"
-                        }}>
-                          <div style={{
-                            width: `${progreso}%`,
-                            height: "100%",
-                            backgroundColor: "#ff9800",
-                            transition: "width 0.3s"
-                          }}></div>
-                        </div>
-                      </div>
-
-                      <div style={{ marginBottom: "1rem" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                          <span style={{ fontSize: "0.9rem", color: "#666" }}>Ahorrado</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#4caf50" }}>
-                            {formatearMonto(meta.montoActual)}
-                          </span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "0.9rem", color: "#666" }}>Objetivo</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#2c3e50" }}>
-                            {formatearMonto(meta.montoObjetivo)}
-                          </span>
-                        </div>
-                        <div style={{ 
-                          display: "flex", 
-                          justifyContent: "space-between",
-                          marginTop: "0.5rem",
-                          paddingTop: "0.5rem",
-                          borderTop: "1px solid #e0e0e0"
-                        }}>
-                          <span style={{ fontSize: "0.9rem", color: "#666" }}>Falta</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: "700", color: "#f44336" }}>
-                            {formatearMonto(meta.montoObjetivo - meta.montoActual)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div style={{
-                        backgroundColor: dias < 30 ? "#ffebee" : "#e8f5e9",
-                        padding: "0.75rem",
-                        borderRadius: "4px",
-                        marginBottom: "1rem"
-                      }}>
-                        <div style={{ fontSize: "0.85rem", color: "#666", marginBottom: "0.25rem" }}>
-                          Fecha límite: {formatearFecha(meta.fechaLimite)}
-                        </div>
-                        <div style={{ 
-                          fontSize: "0.9rem", 
-                          fontWeight: "600",
-                          color: dias < 30 ? "#c62828" : "#2e7d32"
-                        }}>
-                          {dias > 0 ? `${dias} días restantes` : 'Fecha vencida'}
-                        </div>
-                      </div>
-
-                      <div style={{ display: "flex", gap: "0.5rem" }}>
-                        <button
-                          onClick={() => handleAgregarMonto(meta.id, meta.montoActual, meta.montoObjetivo)}
-                          style={{
-                            flex: 1,
-                            padding: "0.75rem",
-                            backgroundColor: "#4caf50",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "0.9rem",
-                            fontWeight: "500"
-                          }}
-                        >
-                          💰 Agregar Monto
-                        </button>
-                        <button
-                          onClick={() => handleEliminar(meta.id)}
-                          style={{
-                            padding: "0.75rem 1rem",
-                            backgroundColor: "#f44336",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "0.9rem"
-                          }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
                     </div>
                   );
                 })}
               </div>
             )}
           </div>
-
-          {/* Metas Completadas */}
-          {metasCompletadas.length > 0 && (
-            <div>
-              <h2 style={{ color: "#2c3e50", marginBottom: "1rem" }}>
-                🎉 Metas Completadas ({metasCompletadas.length})
-              </h2>
-              
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-                gap: "1.5rem"
-              }}>
-                {metasCompletadas.map((meta) => (
-                  <div key={meta.id} style={{
-                    backgroundColor: "white",
-                    borderRadius: "8px",
-                    padding: "1.5rem",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    border: "2px solid #4caf50",
-                    opacity: 0.8
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "1rem" }}>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: "0 0 0.5rem 0", color: "#2c3e50", fontSize: "1.2rem" }}>
-                          {meta.nombre} ✅
-                        </h3>
-                        <span style={{
-                          padding: "0.25rem 0.75rem",
-                          backgroundColor: "#e8f5e9",
-                          color: "#2e7d32",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          fontWeight: "500"
-                        }}>
-                          {meta.categoria}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div style={{
-                      backgroundColor: "#e8f5e9",
-                      padding: "1rem",
-                      borderRadius: "4px",
-                      textAlign: "center",
-                      marginBottom: "1rem"
-                    }}>
-                      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🎯</div>
-                      <div style={{ fontSize: "1.2rem", fontWeight: "700", color: "#2e7d32" }}>
-                        Meta Alcanzada
-                      </div>
-                      <div style={{ fontSize: "1.3rem", fontWeight: "700", color: "#4caf50", marginTop: "0.5rem" }}>
-                        {formatearMonto(meta.montoObjetivo)}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleEliminar(meta.id)}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        backgroundColor: "#f44336",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        fontSize: "0.9rem"
-                      }}
-                    >
-                      🗑️ Eliminar
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </main>
 
       {/* Footer */}
-      <footer style={{
-        backgroundColor: "#096266",
-        color: "white",
-        padding: "2rem",
-        textAlign: "center",
-        marginTop: "2rem"
-      }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
-          Gestión financiera personal
-        </p>
+      <footer className="bg-[#096266] text-white text-center py-6 mt-auto">
+        <p>© 2024 OrdenateYA - Gestión de Finanzas Personales</p>
       </footer>
     </div>
   );

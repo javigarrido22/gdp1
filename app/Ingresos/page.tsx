@@ -3,447 +3,324 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-
-interface Usuario {
-  id: number;
-  nombres: string;
-  apellidos: string;
-  correo: string;
-}
-
-interface Ingreso {
-  id: number;
-  descripcion: string;
-  monto: number;
-  fecha: string;
-  categoria: string;
-}
 
 export default function IngresosPage() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [ingresos, setIngresos] = useState<Ingreso[]>([]);
-  const [cargando, setCargando] = useState(true);
+  const router = useRouter();
+  const [usuario, setUsuario] = useState<any>(null);
+  const [ingresos, setIngresos] = useState<any[]>([]);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [formData, setFormData] = useState({
+  const [nuevoIngreso, setNuevoIngreso] = useState({
     descripcion: "",
     monto: "",
-    fecha: new Date().toISOString().split('T')[0],
-    categoria: "Salario"
+    categoria: "",
+    fecha: new Date().toISOString().split('T')[0]
   });
-  const [error, setError] = useState("");
-  const [exito, setExito] = useState("");
-  const router = useRouter();
+  const [ingresoEditando, setIngresoEditando] = useState<number | null>(null);
+  const [datosEdicion, setDatosEdicion] = useState({
+    descripcion: "",
+    monto: "",
+    categoria: "",
+    fecha: ""
+  });
 
+  // Categorías predefinidas para ingresos
   const categorias = [
     "Salario",
     "Freelance",
     "Inversiones",
-    "Venta",
-    "Regalo",
-    "Bono",
-    "Otro"
+    "Negocios",
+    "Bonos",
+    "Regalos",
+    "Otros"
   ];
 
   useEffect(() => {
-    const usuarioGuardado = localStorage.getItem('usuario');
-    
+    const usuarioGuardado = localStorage.getItem("usuario");
     if (!usuarioGuardado) {
-      router.push('/');
-      return;
+      router.push("/");
+    } else {
+      const user = JSON.parse(usuarioGuardado);
+      setUsuario(user);
     }
+  }, []);
 
-    const usuarioData = JSON.parse(usuarioGuardado);
-    setUsuario(usuarioData);
-    cargarIngresos(usuarioData.id);
-  }, [router]);
+  useEffect(() => {
+    if (usuario) {
+      cargarIngresos();
+    }
+  }, [usuario]);
 
-  const cargarIngresos = async (usuarioId: number) => {
+  const cargarIngresos = async () => {
+    if (!usuario) return;
+
     try {
-      const response = await fetch(`/api/ingresos?usuarioId=${usuarioId}`);
-      const data = await response.json();
-      
+      const response = await fetch(`/api/ingresos?usuarioId=${usuario.id}`);
       if (response.ok) {
-        setIngresos(data.ingresos);
+        const data = await response.json();
+        setIngresos(data.ingresos || data);
       }
     } catch (error) {
-      console.error('Error al cargar ingresos:', error);
-    } finally {
-      setCargando(false);
+      console.error("Error al cargar ingresos:", error);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const agregarIngreso = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setExito("");
-
-    if (!usuario) return;
-
-    if (!formData.descripcion || !formData.monto) {
-      setError("Descripción y monto son requeridos");
+    
+    if (!usuario) {
+      alert("Error: Usuario no encontrado");
       return;
     }
 
     try {
-      const response = await fetch('/api/ingresos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/ingresos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          usuarioId: usuario.id,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Error al crear ingreso');
-        return;
-      }
-
-      setExito('¡Ingreso agregado exitosamente!');
-      setFormData({
-        descripcion: "",
-        monto: "",
-        fecha: new Date().toISOString().split('T')[0],
-        categoria: "Salario"
-      });
-      setMostrarFormulario(false);
-      cargarIngresos(usuario.id);
-
-      setTimeout(() => setExito(""), 3000);
-    } catch (error) {
-      console.error('Error:', error);
-      setError('Error al procesar la solicitud');
-    }
-  };
-
-  const handleEliminar = async (id: number) => {
-    if (!usuario) return;
-    
-    if (!confirm('¿Estás seguro de eliminar este ingreso?')) return;
-
-    try {
-      const response = await fetch(`/api/ingresos?id=${id}&usuarioId=${usuario.id}`, {
-        method: 'DELETE',
+          descripcion: nuevoIngreso.descripcion,
+          monto: parseFloat(nuevoIngreso.monto),
+          categoria: nuevoIngreso.categoria,
+          fecha: nuevoIngreso.fecha,
+          usuarioId: usuario.id
+        })
       });
 
       if (response.ok) {
-        setExito('Ingreso eliminado exitosamente');
-        cargarIngresos(usuario.id);
-        setTimeout(() => setExito(""), 3000);
+        setNuevoIngreso({
+          descripcion: "",
+          monto: "",
+          categoria: "",
+          fecha: new Date().toISOString().split('T')[0]
+        });
+        setMostrarFormulario(false);
+        cargarIngresos();
+      } else {
+        const error = await response.json();
+        alert(`Error: ${error.error || 'No se pudo guardar el ingreso'}`);
       }
     } catch (error) {
-      console.error('Error al eliminar:', error);
-      setError('Error al eliminar el ingreso');
+      console.error("Error al agregar ingreso:", error);
+      alert("Error al guardar el ingreso");
     }
   };
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('usuario');
-    router.push('/');
+  const eliminarIngreso = async (id: number) => {
+    if (confirm("¿Estás seguro de eliminar este ingreso?")) {
+      try {
+        const response = await fetch(`/api/ingresos/${id}`, {
+          method: "DELETE"
+        });
+        if (response.ok) {
+          cargarIngresos();
+        }
+      } catch (error) {
+        console.error("Error al eliminar ingreso:", error);
+      }
+    }
   };
 
-  const formatearMonto = (monto: number) => {
-    return new Intl.NumberFormat('es-CL', {
-      style: 'currency',
-      currency: 'CLP'
-    }).format(monto);
-  };
-
-  const formatearFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const iniciarEdicion = (ingreso: any) => {
+    setIngresoEditando(ingreso.id);
+    setDatosEdicion({
+      descripcion: ingreso.descripcion,
+      monto: ingreso.monto.toString(),
+      categoria: ingreso.categoria || "",
+      fecha: ingreso.fecha.split('T')[0]
     });
   };
 
-  if (!usuario || cargando) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
-        Cargando...
-      </div>
-    );
-  }
+  const guardarEdicion = async (id: number) => {
+    try {
+      const response = await fetch(`/api/ingresos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          descripcion: datosEdicion.descripcion,
+          monto: parseFloat(datosEdicion.monto),
+          categoria: datosEdicion.categoria,
+          fecha: datosEdicion.fecha
+        })
+      });
 
-  const totalIngresos = ingresos.reduce((sum, ing) => sum + Number(ing.monto), 0);
+      if (response.ok) {
+        setIngresoEditando(null);
+        cargarIngresos();
+      }
+    } catch (error) {
+      console.error('Error al actualizar ingreso:', error);
+    }
+  };
+
+  const cancelarEdicion = () => {
+    setIngresoEditando(null);
+    setDatosEdicion({
+      descripcion: "",
+      monto: "",
+      categoria: "",
+      fecha: ""
+    });
+  };
+
+  const handleCerrarSesion = () => {
+    localStorage.removeItem("usuario");
+    router.push("/");
+  };
+
+  const totalIngresos = ingresos.reduce((sum, ingreso) => sum + ingreso.monto, 0);
+
+  if (!usuario) return null;
 
   return (
-    <div style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      minHeight: "100vh",
-      backgroundColor: "#f5f5f5"
-    }}>
-      {/* Header */}
-      <header style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-      }}>
-        <Link href="/dashboard">
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={120} 
-            height={120}
-            style={{ objectFit: "contain", cursor: "pointer" }}
-          />
-        </Link>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <div style={{ textAlign: "right" }}>
-            <p style={{ margin: 0, color: "black", fontWeight: "600", fontSize: "1rem" }}>
-              {usuario.nombres} {usuario.apellidos}
-            </p>
-            <p style={{ margin: 0, color: "#666", fontSize: "0.85rem" }}>
-              {usuario.correo}
-            </p>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Navbar - Responsive */}
+      <nav className="bg-[#096266] text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">💰</span>
+              <h1 className="text-xl font-bold">OrdenateYA</h1>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/dashboard" className="hover:text-gray-200 transition">
+                ← Vista general
+              </Link>
+              <Link href="/ingresos" className="font-bold border-b-2 border-white">
+                Ingresos
+              </Link>
+              <Link href="/egresos" className="hover:text-gray-200 transition">
+                Egresos
+              </Link>
+              <Link href="/metas" className="hover:text-gray-200 transition">
+                Metas
+              </Link>
+              <Link href="/estadisticas" className="hover:text-gray-200 transition">
+                Estadísticas
+              </Link>
+              
+              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
+                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
+                <button
+                  onClick={handleCerrarSesion}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
+                >
+                  Salir
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2">
+              <span className="text-2xl">☰</span>
+            </button>
           </div>
-          <button
-            onClick={cerrarSesion}
-            style={{
-              padding: "0.6rem 1.2rem",
-              backgroundColor: "#e74c3c",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "0.9rem",
-              fontWeight: "500"
-            }}
-          >
-            Cerrar Sesión
-          </button>
         </div>
-      </header>
+      </nav>
 
-      {/* Navegación */}
-      <div style={{
-        backgroundColor: "white",
-        padding: "1rem 2rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-        display: "flex",
-        gap: "1rem"
-      }}>
-        <Link
-          href="/dashboard"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px",
-            transition: "background-color 0.2s"
-          }}
-        >
-          ← Dashboard
-        </Link>
-        <Link
-          href="/ingresos"
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#4caf50",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "4px",
-            fontWeight: "500"
-          }}
-        >
-          Ingresos
-        </Link>
-        <Link
-          href="/egresos"
-          style={{
-            padding: "0.5rem 1rem",
-            color: "#666",
-            textDecoration: "none",
-            borderRadius: "4px",
-            transition: "background-color 0.2s"
-          }}
-        >
-          Egresos
-        </Link>
-      </div>
-
-      {/* Contenido principal */}
-      <main style={{ flex: 1, padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          {/* Encabezado */}
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "2rem"
-          }}>
-            <h1 style={{ color: "#2c3e50", margin: 0 }}>
-              📈 Mis Ingresos
-            </h1>
+      {/* Main Content */}
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                💵 Mis Ingresos
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Registra y controla tus entradas de dinero
+              </p>
+            </div>
+            
             <button
               onClick={() => setMostrarFormulario(!mostrarFormulario)}
-              style={{
-                padding: "0.75rem 1.5rem",
-                backgroundColor: "#4caf50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "1rem",
-                fontWeight: "500"
-              }}
+              className="w-full sm:w-auto px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition"
             >
-              {mostrarFormulario ? "✕ Cancelar" : "➕ Nuevo Ingreso"}
+              {mostrarFormulario ? "Cancelar" : "➕ Nuevo Ingreso"}
             </button>
           </div>
 
-          {/* Mensajes */}
-          {error && (
-            <div style={{
-              backgroundColor: "#fee",
-              border: "1px solid #fcc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#c00"
-            }}>
-              {error}
-            </div>
-          )}
-
-          {exito && (
-            <div style={{
-              backgroundColor: "#efe",
-              border: "1px solid #cfc",
-              borderRadius: "4px",
-              padding: "0.75rem",
-              marginBottom: "1rem",
-              color: "#090"
-            }}>
-              {exito}
-            </div>
-          )}
+          {/* Resumen */}
+          <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-green-700 mb-2">
+              Total Ingresos
+            </h3>
+            <p className="text-3xl sm:text-4xl font-bold text-green-600">
+              ${totalIngresos.toLocaleString('es-CL')}
+            </p>
+          </div>
 
           {/* Formulario */}
           {mostrarFormulario && (
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "2rem",
-              marginBottom: "2rem",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-            }}>
-              <h2 style={{ color: "#2c3e50", marginTop: 0 }}>Agregar Nuevo Ingreso</h2>
-              <form onSubmit={handleSubmit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Registrar Nuevo Ingreso
+              </h3>
+              
+              <form onSubmit={agregarIngreso}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Descripción *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Descripción
                     </label>
                     <input
                       type="text"
-                      value={formData.descripcion}
-                      onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                      placeholder="Ej: Pago de salario"
+                      value={nuevoIngreso.descripcion}
+                      onChange={(e) => setNuevoIngreso({...nuevoIngreso, descripcion: e.target.value})}
                       required
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="Ej: Salario mensual"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
-                      Monto (CLP) *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Monto
                     </label>
                     <input
                       type="number"
-                      value={formData.monto}
-                      onChange={(e) => setFormData({...formData, monto: e.target.value})}
-                      placeholder="0"
+                      value={nuevoIngreso.monto}
+                      onChange={(e) => setNuevoIngreso({...nuevoIngreso, monto: e.target.value})}
                       required
-                      min="0"
-                      step="1"
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      placeholder="0"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition"
                     />
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Categoría
                     </label>
                     <select
-                      value={formData.categoria}
-                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      value={nuevoIngreso.categoria}
+                      onChange={(e) => setNuevoIngreso({...nuevoIngreso, categoria: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition cursor-pointer"
                     >
-                      {categorias.map(cat => (
+                      <option value="">Selecciona una categoría</option>
+                      {categorias.map((cat) => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label style={{ display: "block", marginBottom: "0.5rem", color: "#2c3e50", fontWeight: "500" }}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Fecha
                     </label>
                     <input
                       type="date"
-                      value={formData.fecha}
-                      onChange={(e) => setFormData({...formData, fecha: e.target.value})}
-                      style={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "1rem",
-                        boxSizing: "border-box"
-                      }}
+                      value={nuevoIngreso.fecha}
+                      onChange={(e) => setNuevoIngreso({...nuevoIngreso, fecha: e.target.value})}
+                      required
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition"
                     />
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  style={{
-                    padding: "0.75rem 2rem",
-                    backgroundColor: "#4caf50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "1rem",
-                    fontWeight: "500"
-                  }}
+                  className="w-full sm:w-auto px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition"
                 >
                   Guardar Ingreso
                 </button>
@@ -451,103 +328,132 @@ export default function IngresosPage() {
             </div>
           )}
 
-          {/* Resumen */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            marginBottom: "2rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            border: "2px solid #4caf50"
-          }}>
-            <h3 style={{ margin: "0 0 1rem 0", color: "#2c3e50" }}>Resumen</h3>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Total de Ingresos</p>
-                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#4caf50" }}>
-                  {formatearMonto(totalIngresos)}
-                </p>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.9rem" }}>Cantidad de Registros</p>
-                <p style={{ margin: "0.5rem 0 0 0", fontSize: "2rem", fontWeight: "700", color: "#2c3e50" }}>
-                  {ingresos.length}
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Lista de Ingresos */}
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-6">
+              Lista de Ingresos
+            </h3>
 
-          {/* Lista de ingresos */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-          }}>
-            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>Historial</h3>
-            
             {ingresos.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "3rem", color: "#999" }}>
-                <p style={{ fontSize: "3rem", margin: 0 }}>📊</p>
-                <p style={{ fontSize: "1.1rem", margin: "1rem 0 0 0" }}>
-                  No hay ingresos registrados
-                </p>
-                <p style={{ fontSize: "0.9rem", margin: "0.5rem 0 0 0" }}>
-                  Agrega tu primer ingreso usando el botón de arriba
-                </p>
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-5xl mb-4">📭</p>
+                <p className="text-xl font-medium mb-2">No hay ingresos registrados</p>
+                <p>Comienza agregando tu primer ingreso</p>
               </div>
             ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <table className="w-full min-w-[640px]">
                   <thead>
-                    <tr style={{ borderBottom: "2px solid #e0e0e0" }}>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Fecha</th>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Descripción</th>
-                      <th style={{ padding: "1rem", textAlign: "left", color: "#666", fontWeight: "600" }}>Categoría</th>
-                      <th style={{ padding: "1rem", textAlign: "right", color: "#666", fontWeight: "600" }}>Monto</th>
-                      <th style={{ padding: "1rem", textAlign: "center", color: "#666", fontWeight: "600" }}>Acciones</th>
+                    <tr className="bg-gray-100 border-b-2 border-gray-200">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Descripción
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Monto
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Categoría
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Fecha
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
+                        Acciones
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {ingresos.map((ingreso) => (
-                      <tr key={ingreso.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                        <td style={{ padding: "1rem", color: "#666" }}>
-                          {formatearFecha(ingreso.fecha)}
-                        </td>
-                        <td style={{ padding: "1rem", color: "#2c3e50", fontWeight: "500" }}>
-                          {ingreso.descripcion}
-                        </td>
-                        <td style={{ padding: "1rem" }}>
-                          <span style={{
-                            padding: "0.25rem 0.75rem",
-                            backgroundColor: "#e8f5e9",
-                            color: "#2e7d32",
-                            borderRadius: "12px",
-                            fontSize: "0.85rem",
-                            fontWeight: "500"
-                          }}>
-                            {ingreso.categoria}
-                          </span>
-                        </td>
-                        <td style={{ padding: "1rem", textAlign: "right", color: "#4caf50", fontWeight: "600", fontSize: "1.1rem" }}>
-                          {formatearMonto(Number(ingreso.monto))}
-                        </td>
-                        <td style={{ padding: "1rem", textAlign: "center" }}>
-                          <button
-                            onClick={() => handleEliminar(ingreso.id)}
-                            style={{
-                              padding: "0.5rem 1rem",
-                              backgroundColor: "#f44336",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                              fontSize: "0.85rem"
-                            }}
-                          >
-                            🗑️ Eliminar
-                          </button>
-                        </td>
+                      <tr key={ingreso.id} className="border-b border-gray-200 hover:bg-gray-50 transition">
+                        {ingresoEditando === ingreso.id ? (
+                          // Modo edición
+                          <>
+                            <td className="px-4 py-3">
+                              <input
+                                type="text"
+                                value={datosEdicion.descripcion}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <input
+                                type="number"
+                                value={datosEdicion.monto}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, monto: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <select
+                                value={datosEdicion.categoria}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, categoria: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none cursor-pointer"
+                              >
+                                <option value="">Selecciona categoría</option>
+                                {categorias.map((cat) => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="px-4 py-3">
+                              <input
+                                type="date"
+                                value={datosEdicion.fecha}
+                                onChange={(e) => setDatosEdicion({...datosEdicion, fecha: e.target.value})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
+                              />
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                <button
+                                  onClick={() => guardarEdicion(ingreso.id)}
+                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Guardar
+                                </button>
+                                <button
+                                  onClick={cancelarEdicion}
+                                  className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          // Modo visualización
+                          <>
+                            <td className="px-4 py-3 text-gray-800">
+                              {ingreso.descripcion}
+                            </td>
+                            <td className="px-4 py-3 text-green-600 font-semibold">
+                              ${ingreso.monto.toLocaleString('es-CL')}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {ingreso.categoria || "Sin categoría"}
+                            </td>
+                            <td className="px-4 py-3 text-gray-500">
+                              {new Date(ingreso.fecha).toLocaleDateString('es-CL')}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                                <button
+                                  onClick={() => iniciarEdicion(ingreso)}
+                                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => eliminarIngreso(ingreso.id)}
+                                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -559,16 +465,8 @@ export default function IngresosPage() {
       </main>
 
       {/* Footer */}
-      <footer style={{
-        backgroundColor: "#2c3e50",
-        color: "white",
-        padding: "2rem",
-        textAlign: "center"
-      }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
-          Gestión financiera personal
-        </p>
+      <footer className="bg-[#096266] text-white text-center py-6 mt-auto">
+        <p>© 2024 OrdenateYA - Gestión de Finanzas Personales</p>
       </footer>
     </div>
   );

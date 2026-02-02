@@ -190,9 +190,9 @@ export default function EgresosPage() {
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="hover:text-gray-200 transition">
-                Vista General
+              ← Vista general
               </Link>
-              <Link href="/Ingresos" className="hover:text-gray-200 transition">
+              <Link href="/ingresos" className="hover:text-gray-200 transition">
                 Ingresos
               </Link>
               <Link href="/egresos" className="font-bold border-b-2 border-white">
@@ -242,7 +242,7 @@ export default function EgresosPage() {
               onClick={() => setMostrarFormulario(!mostrarFormulario)}
               className="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition"
             >
-              {mostrarFormulario ? "Cancelar" : "Nuevo Egreso"}
+              {mostrarFormulario ? "Cancelar" : "➕ Nuevo Egreso"}
             </button>
           </div>
 
