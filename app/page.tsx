@@ -61,7 +61,7 @@ export default function LoginPage() {
       {/* Panel izquierdo - Imagen */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -96,13 +96,14 @@ export default function LoginPage() {
             marginBottom: "1rem",
             fontWeight: "700"
           }}>
-            ¡Bienvenido de nuevo!
+            ¡Bienvenido a OrdenateYA!
           </h1>
           <p style={{ 
             fontSize: "1.2rem", 
             opacity: 0.9,
             maxWidth: "400px",
-            lineHeight: "1.6"
+            lineHeight: "1.6",
+            margin: "0 auto"  
           }}>
             Gestiona tus finanzas de manera inteligente y alcanza tus metas financieras
           </p>
@@ -125,16 +126,7 @@ export default function LoginPage() {
           padding: "3rem",
           boxShadow: "0 10px 40px rgba(0,0,0,0.1)"
         }}>
-          {/* Logo */}
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <Image 
-              src="/ordenateya.png" 
-              alt="OrdenateYA Logo" 
-              width={150} 
-              height={150}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
+          
 
           <h2 style={{
             textAlign: "center",
@@ -253,7 +245,7 @@ export default function LoginPage() {
               style={{
                 width: "100%",
                 padding: "1rem",
-                backgroundColor: cargando ? "#ccc" : "#667eea",
+                backgroundColor: cargando ? "#ccc" : "#096266",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
@@ -263,8 +255,8 @@ export default function LoginPage() {
                 transition: "background-color 0.3s",
                 marginBottom: "1rem"
               }}
-              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#5568d3")}
-              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#667eea")}
+              onMouseEnter={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#04474b")}
+              onMouseLeave={(e) => !cargando && (e.currentTarget.style.backgroundColor = "#096266")}
             >
               {cargando ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
