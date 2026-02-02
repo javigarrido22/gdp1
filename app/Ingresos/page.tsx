@@ -161,11 +161,6 @@ export default function IngresosPage() {
     });
   };
 
-  const handleCerrarSesion = () => {
-    localStorage.removeItem("usuario");
-    router.push("/");
-  };
-
   const totalIngresos = ingresos.reduce((sum, ingreso) => sum + ingreso.monto, 0);
 
   if (!usuario) return null;
@@ -198,16 +193,6 @@ export default function IngresosPage() {
               <Link href="/estadisticas" className="hover:text-gray-200 transition">
                 Estadísticas
               </Link>
-              
-              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
-                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
-                <button
-                  onClick={handleCerrarSesion}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
-                >
-                  Salir
-                </button>
-              </div>
             </div>
 
             {/* Mobile Menu Button */}
@@ -236,7 +221,7 @@ export default function IngresosPage() {
               onClick={() => setMostrarFormulario(!mostrarFormulario)}
               className="w-full sm:w-auto px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md transition"
             >
-              {mostrarFormulario ? "Cancelar" : "➕ Nuevo Ingreso"}
+              {mostrarFormulario ? "Cancelar" : "Nuevo Ingreso"}
             </button>
           </div>
 

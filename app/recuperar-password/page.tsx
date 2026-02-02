@@ -139,7 +139,7 @@ export default function RecuperarPasswordPage() {
       {/* Panel izquierdo */}
       <div style={{
         flex: 1,
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: "linear-gradient(135deg, #04474B 0%, #096266 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -209,16 +209,18 @@ export default function RecuperarPasswordPage() {
           padding: "3rem",
           boxShadow: "0 10px 40px rgba(0,0,0,0.1)"
         }}>
-          {/* Logo */}
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <Image 
-              src="/ordenateya.png" 
-              alt="OrdenateYA Logo" 
-              width={150} 
-              height={150}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
+
+          {/* Título arriba del indicador */}
+          <h2 style={{ 
+            color: "#2c3e50", 
+            marginBottom: "1.5rem", 
+            fontSize: "1.5rem",
+            textAlign: "center"
+          }}>
+            {paso === 1 && "Ingresa tus datos"}
+            {paso === 2 && "Ingresa el código"}
+            {paso === 3 && "Crea tu nueva contraseña"}
+          </h2>
 
           {/* Indicador de pasos */}
           <div style={{
@@ -229,12 +231,12 @@ export default function RecuperarPasswordPage() {
             alignItems: "center"
           }}>
             {[1, 2, 3].map((num) => (
-              <>
-                <div key={num} style={{
+              <div key={num} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
-                  backgroundColor: paso >= num ? "#667eea" : "#e0e0e0",
+                  backgroundColor: paso >= num ? "#096266" : "#e0e0e0",
                   color: "white",
                   display: "flex",
                   alignItems: "center",
@@ -248,12 +250,12 @@ export default function RecuperarPasswordPage() {
                   <div style={{
                     width: "40px",
                     height: "4px",
-                    backgroundColor: paso > num ? "#667eea" : "#e0e0e0",
+                    backgroundColor: paso > num ? "#096266" : "#e0e0e0",
                     borderRadius: "2px",
                     transition: "all 0.3s"
                   }}></div>
                 )}
-              </>
+              </div>
             ))}
           </div>
 
@@ -290,10 +292,6 @@ export default function RecuperarPasswordPage() {
           {/* Paso 1: Datos del usuario */}
           {paso === 1 && (
             <form onSubmit={handleEnviarCodigo}>
-              <h2 style={{ color: "#2c3e50", marginBottom: "1rem", fontSize: "1.5rem" }}>
-                Ingresa tus datos
-              </h2>
-              
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -318,7 +316,7 @@ export default function RecuperarPasswordPage() {
                     transition: "border-color 0.3s",
                     boxSizing: "border-box"
                   }}
-                  onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                  onFocus={(e) => e.target.style.borderColor = "#096266"}
                   onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
                 />
               </div>
@@ -358,7 +356,7 @@ export default function RecuperarPasswordPage() {
                 style={{
                   width: "100%",
                   padding: "1rem",
-                  backgroundColor: cargando ? "#ccc" : "#667eea",
+                  backgroundColor: cargando ? "#ccc" : "#096266",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
@@ -376,10 +374,7 @@ export default function RecuperarPasswordPage() {
           {/* Paso 2: Verificar código */}
           {paso === 2 && (
             <form onSubmit={handleVerificarCodigo}>
-              <h2 style={{ color: "#2c3e50", marginBottom: "1rem", fontSize: "1.5rem" }}>
-                Ingresa el código
-              </h2>
-              <p style={{ color: "#666", marginBottom: "1.5rem", fontSize: "0.9rem" }}>
+              <p style={{ color: "#666", marginBottom: "1.5rem", fontSize: "0.9rem", textAlign: "center" }}>
                 Enviamos un código de 6 dígitos a<br/>
                 <strong>{correoEnviado}</strong>
               </p>
@@ -447,7 +442,7 @@ export default function RecuperarPasswordPage() {
                   style={{
                     flex: 2,
                     padding: "1rem",
-                    backgroundColor: "#667eea",
+                    backgroundColor: "#096266",
                     color: "white",
                     border: "none",
                     borderRadius: "8px",
@@ -484,10 +479,6 @@ export default function RecuperarPasswordPage() {
           {/* Paso 3: Nueva contraseña */}
           {paso === 3 && (
             <form onSubmit={handleCambiarPassword}>
-              <h2 style={{ color: "#2c3e50", marginBottom: "1rem", fontSize: "1.5rem" }}>
-                Crea tu nueva contraseña
-              </h2>
-
               <div style={{ marginBottom: "1.5rem" }}>
                 <label style={{
                   display: "block",
@@ -554,7 +545,7 @@ export default function RecuperarPasswordPage() {
                 style={{
                   width: "100%",
                   padding: "1rem",
-                  backgroundColor: cargando ? "#ccc" : "#667eea",
+                  backgroundColor: cargando ? "#ccc" : "#096266",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",

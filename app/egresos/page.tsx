@@ -167,11 +167,6 @@ export default function EgresosPage() {
     });
   };
 
-  const handleCerrarSesion = () => {
-    localStorage.removeItem("usuario");
-    router.push("/");
-  };
-
   const totalEgresos = egresos.reduce((sum, egreso) => sum + egreso.monto, 0);
 
   if (!usuario) return null;
@@ -190,7 +185,7 @@ export default function EgresosPage() {
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="hover:text-gray-200 transition">
-              ← Vista general
+                ← Vista general
               </Link>
               <Link href="/ingresos" className="hover:text-gray-200 transition">
                 Ingresos
@@ -204,16 +199,6 @@ export default function EgresosPage() {
               <Link href="/estadisticas" className="hover:text-gray-200 transition">
                 Estadísticas
               </Link>
-              
-              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
-                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
-                <button
-                  onClick={handleCerrarSesion}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
-                >
-                  Salir
-                </button>
-              </div>
             </div>
 
             {/* Mobile Menu Button */}

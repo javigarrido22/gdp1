@@ -73,11 +73,6 @@ export default function EstadisticasPage() {
     }
   };
 
-  const handleCerrarSesion = () => {
-    localStorage.removeItem("usuario");
-    router.push("/");
-  };
-
   // Cálculos
   const totalIngresos = ingresos.reduce((sum, ing) => sum + ing.monto, 0);
   const totalEgresos = egresos.reduce((sum, eg) => sum + eg.monto, 0);
@@ -155,16 +150,6 @@ export default function EstadisticasPage() {
               <Link href="/estadisticas" className="font-bold border-b-2 border-white">
                 Estadísticas
               </Link>
-              
-              <div className="border-l border-white/30 pl-6 flex items-center gap-3">
-                <span className="hidden lg:inline">👤 {usuario.nombres}</span>
-                <button
-                  onClick={handleCerrarSesion}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition font-medium"
-                >
-                  Salir
-                </button>
-              </div>
             </div>
 
             {/* Mobile Menu Button */}
