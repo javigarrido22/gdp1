@@ -48,13 +48,13 @@ model Egreso {
 
 model Meta {
   id              Int      @id @default(autoincrement())
-  nombre          String
+  titulo          String   // Asegúrate que dice 'titulo' no 'nombre'
   descripcion     String?
   montoObjetivo   Float
   montoActual     Float    @default(0)
   fechaInicio     DateTime @default(now())
-  fechaLimite     DateTime
-  categoria       String
+  fechaLimite     DateTime?
+  categoria       String?
   completada      Boolean  @default(false)
   usuarioId       Int
   usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)

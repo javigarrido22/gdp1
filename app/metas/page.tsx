@@ -61,6 +61,14 @@ export default function MetasPage() {
       return;
     }
 
+    console.log("Datos a enviar:", {
+      titulo: nuevaMeta.titulo,
+      montoObjetivo: parseFloat(nuevaMeta.montoObjetivo),
+      montoActual: parseFloat(nuevaMeta.montoActual || "0"),
+      fechaLimite: nuevaMeta.fechaLimite || null,
+      usuarioId: usuario.id
+    });
+
     try {
       const response = await fetch("/api/metas", {
         method: "POST",
@@ -74,6 +82,9 @@ export default function MetasPage() {
         })
       });
 
+      const data = await response.json();
+      console.log("Respuesta del servidor:", data);
+
       if (response.ok) {
         setNuevaMeta({
           titulo: "",
@@ -83,13 +94,13 @@ export default function MetasPage() {
         });
         setMostrarFormulario(false);
         cargarMetas();
+        alert("Meta creada exitosamente ✅");
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.error || 'No se pudo guardar la meta'}`);
+        alert(`Error: ${data.error || data.detalles || 'No se pudo guardar la meta'}`);
       }
     } catch (error) {
       console.error("Error al agregar meta:", error);
-      alert("Error al guardar la meta");
+      alert("Error de conexión al guardar la meta");
     }
   };
 
@@ -101,6 +112,7 @@ export default function MetasPage() {
         });
         if (response.ok) {
           cargarMetas();
+          alert("Meta eliminada exitosamente");
         }
       } catch (error) {
         console.error("Error al eliminar meta:", error);
@@ -111,14 +123,33 @@ export default function MetasPage() {
   const iniciarEdicion = (meta: any) => {
     setMetaEditando(meta.id);
     setDatosEdicion({
-      titulo: meta.titulo,
-      montoObjetivo: meta.montoObjetivo.toString(),
-      montoActual: meta.montoActual.toString(),
+      titulo: meta.titulo || "",
+      montoObjetivo: meta.montoObjetivo?.toString() || "",
+      montoActual: meta.montoActual?.toString() || "",
       fechaLimite: meta.fechaLimite ? meta.fechaLimite.split('T')[0] : ""
     });
   };
 
   const guardarEdicion = async (id: number) => {
+    // Validación de campos
+    if (!datosEdicion.titulo.trim()) {
+      alert("El título es obligatorio");
+      return;
+    }
+
+    if (!datosEdicion.montoObjetivo || parseFloat(datosEdicion.montoObjetivo) <= 0) {
+      alert("El monto objetivo debe ser mayor a 0");
+      return;
+    }
+
+    console.log("ID a actualizar:", id, "Tipo:", typeof id);
+    console.log("Datos a enviar:", {
+      titulo: datosEdicion.titulo,
+      montoObjetivo: parseFloat(datosEdicion.montoObjetivo),
+      montoActual: parseFloat(datosEdicion.montoActual || "0"),
+      fechaLimite: datosEdicion.fechaLimite || null
+    });
+
     try {
       const response = await fetch(`/api/metas/${id}`, {
         method: 'PUT',
@@ -126,17 +157,41 @@ export default function MetasPage() {
         body: JSON.stringify({
           titulo: datosEdicion.titulo,
           montoObjetivo: parseFloat(datosEdicion.montoObjetivo),
-          montoActual: parseFloat(datosEdicion.montoActual),
+          montoActual: parseFloat(datosEdicion.montoActual || "0"),
           fechaLimite: datosEdicion.fechaLimite || null
         })
       });
 
-      if (response.ok) {
-        setMetaEditando(null);
-        cargarMetas();
+      console.log("Status de respuesta:", response.status);
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const error = await response.json();
+          console.error("Error del servidor:", error);
+          throw new Error(error.error || error.detalles || 'No se pudo actualizar la meta');
+        } else {
+          const text = await response.text();
+          console.error("Respuesta no-JSON:", text);
+          throw new Error(`Error del servidor (${response.status})`);
+        }
       }
+
+      const data = await response.json();
+      console.log("Meta actualizada:", data);
+      
+      setMetaEditando(null);
+      setDatosEdicion({
+        titulo: "",
+        montoObjetivo: "",
+        montoActual: "",
+        fechaLimite: ""
+      });
+      cargarMetas();
+      alert("Meta actualizada exitosamente ✅");
     } catch (error) {
       console.error('Error al actualizar meta:', error);
+      alert(`Error al actualizar la meta: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   };
 
@@ -158,11 +213,17 @@ export default function MetasPage() {
         body: JSON.stringify({ completada: true })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         cargarMetas();
+        alert("¡Meta completada exitosamente! 🎉");
+      } else {
+        alert(data.mensaje || data.error || "No se pudo marcar como completada");
       }
     } catch (error) {
       console.error('Error al marcar meta como completada:', error);
+      alert("Error al marcar la meta como completada");
     }
   };
 
@@ -335,45 +396,75 @@ export default function MetasPage() {
                       {metaEditando === meta.id ? (
                         // Modo edición
                         <div className="space-y-4">
-                          <input
-                            type="text"
-                            value={datosEdicion.titulo}
-                            onChange={(e) => setDatosEdicion({...datosEdicion, titulo: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                            placeholder="Título"
-                          />
-                          <input
-                            type="number"
-                            value={datosEdicion.montoObjetivo}
-                            onChange={(e) => setDatosEdicion({...datosEdicion, montoObjetivo: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                            placeholder="Monto Objetivo"
-                          />
-                          <input
-                            type="number"
-                            value={datosEdicion.montoActual}
-                            onChange={(e) => setDatosEdicion({...datosEdicion, montoActual: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                            placeholder="Monto Actual"
-                          />
-                          <input
-                            type="date"
-                            value={datosEdicion.fechaLimite}
-                            onChange={(e) => setDatosEdicion({...datosEdicion, fechaLimite: e.target.value})}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
-                          />
+                          <div>
+                            <label htmlFor={`titulo-${meta.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                              Título de la Meta
+                            </label>
+                            <input
+                              id={`titulo-${meta.id}`}
+                              type="text"
+                              value={datosEdicion.titulo || ""}
+                              onChange={(e) => setDatosEdicion({...datosEdicion, titulo: e.target.value})}
+                              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                              placeholder="Ej: Comprar un auto"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor={`montoObjetivo-${meta.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                              Monto Objetivo
+                            </label>
+                            <input
+                              id={`montoObjetivo-${meta.id}`}
+                              type="number"
+                              value={datosEdicion.montoObjetivo || ""}
+                              onChange={(e) => setDatosEdicion({...datosEdicion, montoObjetivo: e.target.value})}
+                              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                              placeholder="0"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor={`montoActual-${meta.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                              Monto Actual
+                            </label>
+                            <input
+                              id={`montoActual-${meta.id}`}
+                              type="number"
+                              value={datosEdicion.montoActual || ""}
+                              onChange={(e) => setDatosEdicion({...datosEdicion, montoActual: e.target.value})}
+                              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                              placeholder="0"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor={`fechaLimite-${meta.id}`} className="block text-sm font-medium text-gray-700 mb-2">
+                              Fecha Límite (opcional)
+                            </label>
+                            <input
+                              id={`fechaLimite-${meta.id}`}
+                              type="date"
+                              value={datosEdicion.fechaLimite || ""}
+                              onChange={(e) => setDatosEdicion({...datosEdicion, fechaLimite: e.target.value})}
+                              className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                            />
+                          </div>
+
                           <div className="flex gap-2">
                             <button
+                              type="button"
                               onClick={() => guardarEdicion(meta.id)}
                               className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
                             >
-                              Guardar
+                              💾 Guardar
                             </button>
                             <button
+                              type="button"
                               onClick={cancelarEdicion}
                               className="flex-1 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition"
                             >
-                              Cancelar
+                              ✖ Cancelar
                             </button>
                           </div>
                         </div>

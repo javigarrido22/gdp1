@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
-// GET - Obtener todas las metas de un usuario
-export async function GET(request: Request) {
+const prisma = new PrismaClient();
+
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const usuarioId = searchParams.get('usuarioId');
@@ -16,10 +17,10 @@ export async function GET(request: Request) {
 
     const metas = await prisma.meta.findMany({
       where: { usuarioId: parseInt(usuarioId) },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'desc' }
     });
 
-    return NextResponse.json({ metas }, { status: 200 });
+    return NextResponse.json({ metas });
   } catch (error) {
     console.error('Error al obtener metas:', error);
     return NextResponse.json(
@@ -29,133 +30,54 @@ export async function GET(request: Request) {
   }
 }
 
-// POST - Crear una nueva meta
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nombre, descripcion, montoObjetivo, fechaLimite, categoria, usuarioId } = body;
+    
+    console.log("Datos recibidos para crear meta:", body);
 
-    if (!nombre || !montoObjetivo || !fechaLimite || !categoria || !usuarioId) {
+    if (!body.usuarioId || !body.titulo || !body.montoObjetivo) {
       return NextResponse.json(
         { error: 'Todos los campos obligatorios son requeridos' },
         { status: 400 }
       );
     }
 
+    // Preparar los datos con tipos correctos
+    const dataToCreate: any = {
+      titulo: body.titulo,
+      montoObjetivo: parseFloat(body.montoObjetivo),
+      montoActual: parseFloat(body.montoActual || "0"),
+      fechaInicio: new Date(),
+      completada: false,
+      usuarioId: parseInt(body.usuarioId)
+    };
+
+    // Solo agregar campos opcionales si tienen valor
+    if (body.descripcion) {
+      dataToCreate.descripcion = body.descripcion;
+    }
+
+    if (body.fechaLimite) {
+      dataToCreate.fechaLimite = new Date(body.fechaLimite);
+    }
+
+    if (body.categoria) {
+      dataToCreate.categoria = body.categoria;
+    }
+
     const nuevaMeta = await prisma.meta.create({
-      data: {
-        nombre,
-        descripcion: descripcion || '',
-        montoObjetivo: parseFloat(montoObjetivo),
-        fechaLimite: new Date(fechaLimite),
-        categoria,
-        usuarioId: parseInt(usuarioId),
-      },
+      data: dataToCreate
     });
 
-    return NextResponse.json(
-      { mensaje: 'Meta creada exitosamente', meta: nuevaMeta },
-      { status: 201 }
-    );
-  } catch (error) {
+    return NextResponse.json(nuevaMeta);
+  } catch (error: any) {
     console.error('Error al crear meta:', error);
     return NextResponse.json(
-      { error: 'Error al crear meta' },
-      { status: 500 }
-    );
-  }
-}
-
-// PUT - Actualizar una meta
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json();
-    const { id, montoActual, completada, usuarioId } = body;
-
-    if (!id || !usuarioId) {
-      return NextResponse.json(
-        { error: 'ID y Usuario ID son requeridos' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar que la meta pertenece al usuario
-    const meta = await prisma.meta.findFirst({
-      where: {
-        id: parseInt(id),
-        usuarioId: parseInt(usuarioId),
+      { 
+        error: 'Error al crear la meta',
+        detalles: error.message
       },
-    });
-
-    if (!meta) {
-      return NextResponse.json(
-        { error: 'Meta no encontrada' },
-        { status: 404 }
-      );
-    }
-
-    const metaActualizada = await prisma.meta.update({
-      where: { id: parseInt(id) },
-      data: {
-        montoActual: montoActual !== undefined ? parseFloat(montoActual) : meta.montoActual,
-        completada: completada !== undefined ? completada : meta.completada,
-      },
-    });
-
-    return NextResponse.json(
-      { mensaje: 'Meta actualizada exitosamente', meta: metaActualizada },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error al actualizar meta:', error);
-    return NextResponse.json(
-      { error: 'Error al actualizar meta' },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE - Eliminar una meta
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const usuarioId = searchParams.get('usuarioId');
-
-    if (!id || !usuarioId) {
-      return NextResponse.json(
-        { error: 'ID y Usuario ID son requeridos' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar que la meta pertenece al usuario
-    const meta = await prisma.meta.findFirst({
-      where: {
-        id: parseInt(id),
-        usuarioId: parseInt(usuarioId),
-      },
-    });
-
-    if (!meta) {
-      return NextResponse.json(
-        { error: 'Meta no encontrada' },
-        { status: 404 }
-      );
-    }
-
-    await prisma.meta.delete({
-      where: { id: parseInt(id) },
-    });
-
-    return NextResponse.json(
-      { mensaje: 'Meta eliminada exitosamente' },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('Error al eliminar meta:', error);
-    return NextResponse.json(
-      { error: 'Error al eliminar meta' },
       { status: 500 }
     );
   }
