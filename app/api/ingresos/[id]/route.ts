@@ -9,22 +9,22 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-    const egreso = await prisma.egreso.findUnique({
+    const ingreso = await prisma.ingreso.findUnique({
       where: { id: parseInt(id) },
     });
 
-    if (!egreso) {
+    if (!ingreso) {
       return NextResponse.json(
-        { error: 'Egreso no encontrado' },
+        { error: 'Ingreso no encontrado' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(egreso);
+    return NextResponse.json(ingreso);
   } catch (error) {
-    console.error('Error al obtener egreso:', error);
+    console.error('Error al obtener ingreso:', error);
     return NextResponse.json(
-      { error: 'Error al obtener egreso' },
+      { error: 'Error al obtener ingreso' },
       { status: 500 }
     );
   } finally {
@@ -40,16 +40,16 @@ export async function PUT(
     const { id } = await context.params;
     const body = await request.json();
     
-    const egresoActualizado = await prisma.egreso.update({
+    const ingresoActualizado = await prisma.ingreso.update({
       where: { id: parseInt(id) },
       data: body,
     });
 
-    return NextResponse.json(egresoActualizado);
+    return NextResponse.json(ingresoActualizado);
   } catch (error) {
-    console.error('Error al actualizar egreso:', error);
+    console.error('Error al actualizar ingreso:', error);
     return NextResponse.json(
-      { error: 'Error al actualizar egreso' },
+      { error: 'Error al actualizar ingreso' },
       { status: 500 }
     );
   } finally {
@@ -64,15 +64,15 @@ export async function DELETE(
   try {
     const { id } = await context.params;
     
-    await prisma.egreso.delete({
+    await prisma.ingreso.delete({
       where: { id: parseInt(id) },
     });
 
-    return NextResponse.json({ message: 'Egreso eliminado correctamente' });
+    return NextResponse.json({ message: 'Ingreso eliminado correctamente' });
   } catch (error) {
-    console.error('Error al eliminar egreso:', error);
+    console.error('Error al eliminar ingreso:', error);
     return NextResponse.json(
-      { error: 'Error al eliminar egreso' },
+      { error: 'Error al eliminar ingreso' },
       { status: 500 }
     );
   } finally {
