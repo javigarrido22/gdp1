@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function MetasPage() {
   const router = useRouter();
@@ -239,10 +240,16 @@ export default function MetasPage() {
       <nav className="bg-[#096266] text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">💰</span>
-              <h1 className="text-xl font-bold">OrdenateYA</h1>
-            </div>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <Image 
+                src="/ordenateya1.png" 
+                alt="OrdenateYA Logo" 
+                width={120} 
+                height={120}
+                className="object-contain"
+                priority
+              />
+            </Link>
             
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-6">

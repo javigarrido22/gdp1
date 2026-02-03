@@ -96,6 +96,10 @@ export default function IndicadoresEconomicos() {
     return () => clearInterval(intervalo);
   }, []);
 
+  // Separar los primeros 4 y los últimos 2
+  const primeraFila = indicadores.slice(0, 4);
+  const segundaFila = indicadores.slice(4, 6);
+
   return (
     <div style={{ 
       display: "flex", 
@@ -109,48 +113,151 @@ export default function IndicadoresEconomicos() {
         width: "100%",
         padding: "0 1rem"
       }}>
-        <h2 style={{ textAlign: "center", color: "black", marginBottom: "1.5rem" }}>
-          📈 Indicadores Económicos
-        </h2>
+        {/* Título mejorado */}
+        <div style={{
+          backgroundColor: "white",
+          borderRadius: "12px",
+          padding: "1.5rem",
+          marginBottom: "1.5rem",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          borderTop: "4px solid #096266",
+          textAlign: "center"
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "0.75rem",
+            marginBottom: "0.5rem"
+          }}>
+            <span style={{ fontSize: "2rem" }}>🏛️</span>
+            <h2 style={{ 
+              margin: 0,
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "#1f2937"
+            }}>
+              Indicadores Económicos de Chile
+            </h2>
+          </div>
+          <p style={{
+            margin: 0,
+            fontSize: "0.875rem",
+            color: "#6b7280"
+          }}>
+            Valores actualizados en tiempo real desde mindicador.cl
+          </p>
+        </div>
         
         {cargando ? (
-          <p style={{ textAlign: "center" }}>Cargando indicadores...</p>
-        ) : (
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "1rem"
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "2rem",
+            textAlign: "center",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
           }}>
-            {indicadores.map((item) => (
-              <div
-                key={item.codigo}
-                style={{
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  padding: "1rem",
-                  backgroundColor: "#f9f9f9",
-                }}
-              >
-                <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", color: "black" }}>
-                  {item.nombre}
-                </h3>
-                <p style={{ margin: "0 0 0.5rem 0", fontSize: "1.2rem", fontWeight: "bold", color: "#4CAF50" }}>
-                  ${item.valor.toLocaleString("es-CL", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={{ margin: 0, fontSize: "0.85rem", color: "#666" }}>
-                  Actualizado: {new Date(item.fecha).toLocaleDateString("es-CL")}
-                  {item.codigo === 'ipc' && (
-                    <span style={{ fontSize: "0.75rem", color: "#999" }}> (Mensual)</span>
-                  )}
-                </p>
+            <div style={{
+              display: "inline-block",
+              width: "2rem",
+              height: "2rem",
+              border: "3px solid #e5e7eb",
+              borderTopColor: "#096266",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite"
+            }}></div>
+            <p style={{ marginTop: "1rem", color: "#6b7280" }}>
+              Cargando indicadores económicos...
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            {/* Primera fila: 4 tarjetas */}
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "1rem"
+            }}>
+              {primeraFila.map((item) => (
+                <div
+                  key={item.codigo}
+                  style={{
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    padding: "1rem",
+                    backgroundColor: "#f9f9f9",
+                  }}
+                >
+                  <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", color: "black" }}>
+                    {item.nombre}
+                  </h3>
+                  <p style={{ margin: "0 0 0.5rem 0", fontSize: "1.2rem", fontWeight: "bold", color: "#4CAF50" }}>
+                    ${item.valor.toLocaleString("es-CL", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
+                  <p style={{ margin: 0, fontSize: "0.85rem", color: "#666" }}>
+                    Actualizado: {new Date(item.fecha).toLocaleDateString("es-CL")}
+                    {item.codigo === 'ipc' && (
+                      <span style={{ fontSize: "0.75rem", color: "#999" }}> (Mensual)</span>
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Segunda fila: 2 tarjetas centradas */}
+            {segundaFila.length > 0 && (
+              <div style={{ 
+                display: "flex",
+                justifyContent: "center",
+                gap: "1rem"
+              }}>
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(250px, 300px))",
+                  gap: "1rem"
+                }}>
+                  {segundaFila.map((item) => (
+                    <div
+                      key={item.codigo}
+                      style={{
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        padding: "1rem",
+                        backgroundColor: "#f9f9f9",
+                      }}
+                    >
+                      <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", color: "black" }}>
+                        {item.nombre}
+                      </h3>
+                      <p style={{ margin: "0 0 0.5rem 0", fontSize: "1.2rem", fontWeight: "bold", color: "#4CAF50" }}>
+                        ${item.valor.toLocaleString("es-CL", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </p>
+                      <p style={{ margin: 0, fontSize: "0.85rem", color: "#666" }}>
+                        Actualizado: {new Date(item.fecha).toLocaleDateString("es-CL")}
+                        {item.codigo === 'ipc' && (
+                          <span style={{ fontSize: "0.75rem", color: "#999" }}> (Mensual)</span>
+                        )}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
+      
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

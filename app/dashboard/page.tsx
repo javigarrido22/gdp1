@@ -45,7 +45,6 @@ export default function DashboardPage() {
     const usuarioData = JSON.parse(usuarioGuardado);
     setUsuario(usuarioData);
     
-    // Aquí puedes cargar el resumen real desde tu API
     cargarResumen(usuarioData.id);
   }, [router]);
 
@@ -83,582 +82,252 @@ export default function DashboardPage() {
 
   if (!usuario) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        fontSize: '1.2rem',
-        color: '#666'
-      }}>
+      <div className="flex justify-center items-center min-h-screen text-xl text-gray-600">
         Cargando...
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      minHeight: "100vh",
-      backgroundColor: "#f5f5f5"
-    }}>
-      {/* Header */}
-      <header style={{
-        backgroundColor: "#096266",
-        padding: "1rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        position: "relative"
-      }}>
-        <Link href="/dashboard">
-          <Image 
-            src="/ordenateya.png" 
-            alt="OrdenateYA Logo" 
-            width={120} 
-            height={120}
-            style={{ objectFit: "contain", cursor: "pointer" }}
-          />
-        </Link>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          {/* Menú de usuario */}
-          <div style={{ position: "relative" }}>
-            <button
-              onClick={() => setMenuUsuarioAbierto(!menuUsuarioAbierto)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-                padding: "0.5rem 1rem",
-                backgroundColor: "#f0f0f0",
-                border: "2px solid #e0e0e0",
-                borderRadius: "50px",
-                cursor: "pointer",
-                transition: "all 0.2s"
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#e8e8e8"}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
-            >
-              <div style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "50%",
-                backgroundColor: "#667eea",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "700",
-                fontSize: "1rem"
-              }}>
-                {obtenerIniciales(usuario.nombres, usuario.apellidos)}
-              </div>
-              
-              <div style={{ textAlign: "left" }}>
-                <p style={{ margin: 0, color: "#2c3e50", fontWeight: "600", fontSize: "0.95rem" }}>
-                  {usuario.nombres} {usuario.apellidos}
-                </p>
-                <p style={{ margin: 0, color: "#666", fontSize: "0.75rem" }}>
-                  {usuario.correo}
-                </p>
-              </div>
-
-              <svg 
-                width="16" 
-                height="16" 
-                viewBox="0 0 16 16" 
-                fill="none"
-                style={{
-                  transform: menuUsuarioAbierto ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 0.2s"
-                }}
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Navbar */}
+      <nav className="bg-[#096266] text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <Image 
+                src="/ordenateya1.png" 
+                alt="OrdenateYA Logo" 
+                width={120} 
+                height={120}
+                className="object-contain"
+              />
+              <h1 className="text-xl font-bold"></h1>
+            </Link>
+            
+            {/* Menú de usuario */}
+            <div className="relative">
+              <button
+                onClick={() => setMenuUsuarioAbierto(!menuUsuarioAbierto)}
+                className="flex items-center gap-3 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full transition-all"
               >
-                <path d="M4 6L8 10L12 6" stroke="#666" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-
-            {menuUsuarioAbierto && (
-              <div style={{
-                position: "absolute",
-                top: "calc(100% + 0.5rem)",
-                right: 0,
-                backgroundColor: "white",
-                borderRadius: "8px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                minWidth: "250px",
-                zIndex: 1000,
-                overflow: "hidden"
-              }}>
-                <div style={{
-                  padding: "1rem",
-                  borderBottom: "1px solid #e0e0e0",
-                  backgroundColor: "#f9f9f9"
-                }}>
-                  <p style={{ 
-                    margin: "0 0 0.25rem 0", 
-                    fontWeight: "600", 
-                    color: "#2c3e50",
-                    fontSize: "1rem"
-                  }}>
-                    {usuario.nombres} {usuario.apellidos}
-                  </p>
-                  <p style={{ 
-                    margin: "0 0 0.25rem 0", 
-                    color: "#666", 
-                    fontSize: "0.85rem" 
-                  }}>
-                    {usuario.correo}
-                  </p>
-                  <p style={{ 
-                    margin: 0, 
-                    color: "#666", 
-                    fontSize: "0.85rem" 
-                  }}>
-                    {usuario.telefono}
-                  </p>
+                <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-sm">
+                  {obtenerIniciales(usuario.nombres, usuario.apellidos)}
+                </div>
+                
+                <div className="hidden md:block text-left">
+                  <p className="font-semibold text-sm">{usuario.nombres} {usuario.apellidos}</p>
+                  <p className="text-xs text-white/70">{usuario.correo}</p>
                 </div>
 
-                <div style={{ padding: "0.5rem 0" }}>
-                  <button
-                    onClick={() => {
-                      setMenuUsuarioAbierto(false);
-                      router.push('/perfil');
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem 1rem",
-                      backgroundColor: "transparent",
-                      border: "none",
-                      textAlign: "left",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                      fontSize: "0.95rem",
-                      color: "#2c3e50",
-                      transition: "background-color 0.2s"
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f5f5f5"}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                  >
-                    <span style={{ fontSize: "1.2rem" }}>👤</span>
-                    Modificar datos personales
-                  </button>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${menuUsuarioAbierto ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-                  <div style={{
-                    height: "1px",
-                    backgroundColor: "#e0e0e0",
-                    margin: "0.5rem 0"
-                  }}></div>
+              {menuUsuarioAbierto && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl overflow-hidden z-50">
+                  <div className="p-4 bg-gray-50 border-b">
+                    <p className="font-semibold text-gray-800">{usuario.nombres} {usuario.apellidos}</p>
+                    <p className="text-sm text-gray-600">{usuario.correo}</p>
+                    <p className="text-sm text-gray-600">{usuario.telefono}</p>
+                  </div>
 
-                  <button
-                    onClick={() => {
-                      setMenuUsuarioAbierto(false);
-                      cerrarSesion();
-                    }}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem 1rem",
-                      backgroundColor: "transparent",
-                      border: "none",
-                      textAlign: "left",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.75rem",
-                      fontSize: "0.95rem",
-                      color: "#e74c3c",
-                      transition: "background-color 0.2s",
-                      fontWeight: "500"
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#fee"}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                  >
-                    <span style={{ fontSize: "1.2rem" }}>🚪</span>
-                    Cerrar Sesión
-                  </button>
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setMenuUsuarioAbierto(false);
+                        router.push('/perfil');
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                    >
+                      <span className="text-xl">👤</span>
+                      <span className="text-gray-700">Modificar datos personales</span>
+                    </button>
+
+                    <hr className="my-2" />
+
+                    <button
+                      onClick={() => {
+                        setMenuUsuarioAbierto(false);
+                        cerrarSesion();
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-red-50 flex items-center gap-3 transition-colors text-red-600"
+                    >
+                      <span className="text-xl">🚪</span>
+                      <span className="font-medium">Cerrar Sesión</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Body principal */}
-      <main style={{
-        flex: 1,
-        padding: "2rem 1rem"
-      }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      {/* Main Content */}
+      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
           {/* Bienvenida */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "2rem",
-            marginBottom: "2rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            textAlign: "center"
-          }}>
-            <h1 style={{ 
-              color: "#2c3e50", 
-              margin: "0 0 0.5rem 0",
-              fontSize: "2rem"
-            }}>
+          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 mb-6 text-center border-t-4 border-[#096266]">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
               ¡Bienvenido/a, {usuario.nombres}! 👋
             </h1>
-            <p style={{ color: "#666", margin: 0, fontSize: "1rem" }}>
+            <p className="text-gray-600 text-lg">
               Gestiona tus finanzas de manera simple y efectiva
             </p>
           </div>
 
           {/* Indicadores Económicos */}
-          <div style={{ 
-            marginBottom: "2rem",
-            display: "flex",
-            justifyContent: "center"
-          }}>
-            <div style={{ width: "100%" }}>
-              <IndicadoresEconomicos />
-            </div>
+          <div className="mb-6">
+            <IndicadoresEconomicos />
           </div>
 
           {/* Tarjetas de navegación */}
-          <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "1.5rem",
-            marginBottom: "2rem"
-          }}>
-            {/* Tarjeta Ingresos */}
-            <Link
-              href="/ingresos"
-              style={{
-                textDecoration: "none",
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "2rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                cursor: "pointer",
-                border: "2px solid transparent"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(76, 175, 80, 0.3)";
-                e.currentTarget.style.borderColor = "#4caf50";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
-                📈
-              </div>
-              <h2 style={{ 
-                color: "#4caf50", 
-                margin: "0 0 0.5rem 0",
-                fontSize: "1.5rem",
-                textAlign: "center"
-              }}>
-                Ingresos
-              </h2>
-              <p style={{ 
-                color: "#666", 
-                margin: 0,
-                textAlign: "center",
-                fontSize: "0.95rem"
-              }}>
-                Registra y visualiza todos tus ingresos mensuales
-              </p>
-            </Link>
-
-            {/* Tarjeta Egresos */}
-            <Link
-              href="/egresos"
-              style={{
-                textDecoration: "none",
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "2rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                cursor: "pointer",
-                border: "2px solid transparent"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(244, 67, 54, 0.3)";
-                e.currentTarget.style.borderColor = "#f44336";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
-                📉
-              </div>
-              <h2 style={{ 
-                color: "#f44336", 
-                margin: "0 0 0.5rem 0",
-                fontSize: "1.5rem",
-                textAlign: "center"
-              }}>
-                Egresos
-              </h2>
-              <p style={{ 
-                color: "#f44336", 
-                margin: "0.5rem 0",
-                textAlign: "center",
-                fontSize: "1.3rem",
-                fontWeight: "700"
-              }}>
-                {formatearMonto(resumen.totalEgresos)}
-              </p>
-              <p style={{ 
-                color: "#666", 
-                margin: 0,
-                textAlign: "center",
-                fontSize: "0.85rem"
-              }}>
-                {resumen.cantidadEgresos} registro{resumen.cantidadEgresos !== 1 ? 's' : ''}
-              </p>
-            </Link>
-
-            {/* Tarjeta Balance */}
-            <div
-              style={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "2rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                border: "2px solid #3498db"
-              }}
-            >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
-                💰
-              </div>
-              <h2 style={{ 
-                color: "#3498db", 
-                margin: "0 0 0.5rem 0",
-                fontSize: "1.5rem",
-                textAlign: "center"
-              }}>
-                Balance
-              </h2>
-              <div style={{ marginTop: "1.5rem" }}>
-                <div style={{ 
-                  display: "flex", 
-                  justifyContent: "space-between",
-                  marginBottom: "0.75rem",
-                  padding: "0.5rem",
-                  backgroundColor: "#e8f5e9",
-                  borderRadius: "4px"
-                }}>
-                  <span style={{ color: "#2e7d32", fontWeight: "500", fontSize: "0.9rem" }}>Ingresos:</span>
-                  <span style={{ color: "#2e7d32", fontWeight: "600", fontSize: "0.9rem" }}>
-                    {formatearMonto(resumen.totalIngresos)}
-                  </span>
-                </div>
-                <div style={{ 
-                  display: "flex", 
-                  justifyContent: "space-between",
-                  marginBottom: "0.75rem",
-                  padding: "0.5rem",
-                  backgroundColor: "#ffebee",
-                  borderRadius: "4px"
-                }}>
-                  <span style={{ color: "#c62828", fontWeight: "500", fontSize: "0.9rem" }}>Egresos:</span>
-                  <span style={{ color: "#c62828", fontWeight: "600", fontSize: "0.9rem" }}>
-                    {formatearMonto(resumen.totalEgresos)}
-                  </span>
-                </div>
-                <div style={{ 
-                  display: "flex", 
-                  justifyContent: "space-between",
-                  padding: "0.75rem",
-                  backgroundColor: resumen.balance >= 0 ? "#e3f2fd" : "#ffebee",
-                  borderRadius: "4px",
-                  marginTop: "1rem",
-                  borderTop: `2px solid ${resumen.balance >= 0 ? "#3498db" : "#f44336"}`
-                }}>
-                  <span style={{ 
-                    color: resumen.balance >= 0 ? "#1565c0" : "#c62828", 
-                    fontWeight: "600", 
-                    fontSize: "1.1rem" 
-                  }}>
-                    Total:
-                  </span>
-                  <span style={{ 
-                    color: resumen.balance >= 0 ? "#1565c0" : "#c62828", 
-                    fontWeight: "700", 
-                    fontSize: "1.1rem" 
-                  }}>
-                    {formatearMonto(resumen.balance)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Tarjeta Estadísticas */}
-            <Link
-              href="/estadisticas"
-              style={{
-                textDecoration: "none",
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "2rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                cursor: "pointer",
-                border: "2px solid transparent"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(156, 39, 176, 0.3)";
-                e.currentTarget.style.borderColor = "#9c27b0";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
-                📊
-              </div>
-              <h2 style={{ 
-                color: "#9c27b0", 
-                margin: "0 0 0.5rem 0",
-                fontSize: "1.5rem",
-                textAlign: "center"
-              }}>
-                Estadísticas
-              </h2>
-              <p style={{ 
-                color: "#666", 
-                margin: 0,
-                textAlign: "center",
-                fontSize: "0.95rem"
-              }}>
-                Visualiza tus datos financieros
-              </p>
-            </Link>
-
-            {/* Tarjeta Metas */}
-            <Link
-              href="/metas"
-              style={{
-                textDecoration: "none",
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "2rem",
-                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                cursor: "pointer",
-                border: "2px solid transparent"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-5px)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(255, 152, 0, 0.3)";
-                e.currentTarget.style.borderColor = "#ff9800";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <div style={{ fontSize: "3rem", marginBottom: "1rem", textAlign: "center" }}>
-                🎯
-              </div>
-              <h2 style={{ 
-                color: "#ff9800", 
-                margin: "0 0 0.5rem 0",
-                fontSize: "1.5rem",
-                textAlign: "center"
-              }}>
-                Metas
-              </h2>
-              <p style={{ 
-                color: "#666", 
-                margin: 0,
-                textAlign: "center",
-                fontSize: "0.95rem"
-              }}>
-                Define y alcanza tus objetivos
-              </p>
-            </Link>
-          </div>
-
-          {/* Acceso rápido */}
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "8px",
-            padding: "1.5rem",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1),",
-            border: "2px solid #ddd"
-          }}>
-            <h3 style={{ color: "#2c3e50", marginTop: 0, marginBottom: "1rem" }}>
-              ⚡ Acciones Rápidas
-            </h3>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+          <div className="space-y-6">
+            {/* Primera fila: 4 tarjetas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Tarjeta Ingresos */}
               <Link
                 href="/ingresos"
-                style={{
-                  padding: "0.75rem 1.5rem",
-                  backgroundColor: "#4caf50",
-                  color: "white",
-                  textDecoration: "none",
-                  borderRadius: "5px",
-                  fontWeight: "500",
-                  fontSize: "0.95rem",
-                  transition: "background-color 0.2s"
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#45a049"}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#4caf50"}
+                className="group bg-white rounded-xl shadow-md hover:shadow-xl p-6 transition-all duration-300 border-2 border-transparent hover:border-green-500 hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">💵</div>
+                  <h2 className="text-xl font-bold text-green-600 mb-2">Ingresos</h2>
+                  <p className="text-2xl font-bold text-green-700 mb-2">
+                    {formatearMonto(resumen.totalIngresos)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {resumen.cantidadIngresos} registro{resumen.cantidadIngresos !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </Link>
+
+              {/* Tarjeta Egresos */}
+              <Link
+                href="/egresos"
+                className="group bg-white rounded-xl shadow-md hover:shadow-xl p-6 transition-all duration-300 border-2 border-transparent hover:border-red-500 hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">💸</div>
+                  <h2 className="text-xl font-bold text-red-600 mb-2">Egresos</h2>
+                  <p className="text-2xl font-bold text-red-700 mb-2">
+                    {formatearMonto(resumen.totalEgresos)}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {resumen.cantidadEgresos} registro{resumen.cantidadEgresos !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </Link>
+
+              {/* Tarjeta Estadísticas */}
+              <Link
+                href="/estadisticas"
+                className="group bg-white rounded-xl shadow-md hover:shadow-xl p-6 transition-all duration-300 border-2 border-transparent hover:border-purple-500 hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">📊</div>
+                  <h2 className="text-xl font-bold text-purple-600 mb-2">Estadísticas</h2>
+                  <p className="text-gray-600 text-sm mt-4">
+                    Visualiza gráficos y análisis de tus finanzas
+                  </p>
+                </div>
+              </Link>
+
+              {/* Tarjeta Metas */}
+              <Link
+                href="/metas"
+                className="group bg-white rounded-xl shadow-md hover:shadow-xl p-6 transition-all duration-300 border-2 border-transparent hover:border-orange-500 hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">🎯</div>
+                  <h2 className="text-xl font-bold text-orange-600 mb-2">Metas</h2>
+                  <p className="text-gray-600 text-sm mt-4">
+                    Define y alcanza tus objetivos financieros
+                  </p>
+                </div>
+              </Link>
+            </div>
+
+            {/* Segunda fila: 2 tarjetas centradas */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-start-2">
+                {/* Tarjeta Balance */}
+                <div className={`bg-white rounded-xl shadow-md p-6 border-2 ${resumen.balance >= 0 ? 'border-blue-500' : 'border-red-500'}`}>
+                  <div className="text-center">
+                    <div className="text-5xl mb-4">💰</div>
+                    <h2 className="text-xl font-bold text-blue-600 mb-4">Balance Total</h2>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <span className="text-green-700 font-medium text-sm">Ingresos:</span>
+                        <span className="text-green-800 font-bold text-sm">{formatearMonto(resumen.totalIngresos)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                        <span className="text-red-700 font-medium text-sm">Egresos:</span>
+                        <span className="text-red-800 font-bold text-sm">{formatearMonto(resumen.totalEgresos)}</span>
+                      </div>
+                      
+                      <div className={`flex justify-between items-center p-4 rounded-lg ${resumen.balance >= 0 ? 'bg-blue-50' : 'bg-red-50'} border-t-2 ${resumen.balance >= 0 ? 'border-blue-500' : 'border-red-500'}`}>
+                        <span className={`font-bold ${resumen.balance >= 0 ? 'text-blue-700' : 'text-red-700'}`}>
+                          Total:
+                        </span>
+                        <span className={`font-bold text-xl ${resumen.balance >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
+                          {formatearMonto(resumen.balance)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tarjeta Perfil */}
+              <Link
+                href="/perfil"
+                className="group bg-white rounded-xl shadow-md hover:shadow-xl p-6 transition-all duration-300 border-2 border-transparent hover:border-[#096266] hover:-translate-y-1"
+              >
+                <div className="text-center">
+                  <div className="text-5xl mb-4">⚙️</div>
+                  <h2 className="text-xl font-bold text-[#096266] mb-2">Perfil</h2>
+                  <p className="text-gray-600 text-sm mt-4">
+                    Actualiza tu información personal
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          {/* Acciones Rápidas */}
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-[#096266] mt-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span className="text-2xl">⚡</span>
+              Acciones Rápidas
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/ingresos"
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
               >
                 ➕ Agregar Ingreso
               </Link>
 
               <Link
                 href="/egresos"
-                style={{
-                  padding: "0.75rem 1.5rem",
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  textDecoration: "none",
-                  borderRadius: "5px",
-                  fontWeight: "500",
-                  fontSize: "0.95rem",
-                  transition: "background-color 0.2s"
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#da190b"}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f44336"}
+                className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
               >
                 ➖ Agregar Egreso
               </Link>
 
               <Link
                 href="/metas"
-                style={{
-                  padding: "0.75rem 1.5rem",
-                  backgroundColor: "#ff9800",
-                  color: "white",
-                  textDecoration: "none",
-                  borderRadius: "5px",
-                  fontWeight: "500",
-                  fontSize: "0.95rem",
-                  transition: "background-color 0.2s"
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f57c00"}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#ff9800"}
+                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
               >
                 🎯 Nueva Meta
               </Link>
@@ -668,14 +337,9 @@ export default function DashboardPage() {
       </main>
 
       {/* Footer */}
-      <footer style={{
-        backgroundColor: "#096266",
-        color: "white",
-        padding: "2rem",
-        textAlign: "center"
-      }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
-        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
+      <footer className="bg-[#096266] text-white p-8 text-center mt-8">
+        <p className="mb-2">© 2026 OrdenateYA! - Todos los derechos reservados</p>
+        <p className="text-sm text-gray-300">
           Gestión financiera personal
         </p>
       </footer>
