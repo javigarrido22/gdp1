@@ -368,8 +368,16 @@ export default function EstadisticasPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#096266] text-white text-center py-6 mt-auto">
-        <p>© 2024 OrdenateYA - Gestión de Finanzas Personales</p>
+      <footer style={{
+        backgroundColor: "#096266",
+        color: "white",
+        padding: "2rem",
+        textAlign: "center"
+      }}>
+        <p style={{ margin: "0 0 0.5rem 0" }}>© 2026 OrdenateYA! - Todos los derechos reservados</p>
+        <p style={{ margin: 0, fontSize: "0.9rem", color: "#bdc3c7" }}>
+          Gestión financiera personal
+        </p>
       </footer>
     </div>
   );

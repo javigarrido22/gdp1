@@ -105,7 +105,7 @@ export default function DashboardPage() {
     }}>
       {/* Header */}
       <header style={{
-        backgroundColor: "white",
+        backgroundColor: "#096266",
         padding: "1rem 2rem",
         display: "flex",
         justifyContent: "space-between",
@@ -669,7 +669,7 @@ export default function DashboardPage() {
 
       {/* Footer */}
       <footer style={{
-        backgroundColor: "#2c3e50",
+        backgroundColor: "#096266",
         color: "white",
         padding: "2rem",
         textAlign: "center"
