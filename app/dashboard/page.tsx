@@ -261,7 +261,7 @@ export default function DashboardPage() {
                 {/* Tarjeta Balance */}
                 <div className={`bg-white rounded-xl shadow-md p-6 border-2 ${resumen.balance >= 0 ? 'border-blue-500' : 'border-red-500'}`}>
                   <div className="text-center">
-                    <div className="text-5xl mb-4">💰</div>
+                    <div className="text-5xl mb-4">⚖️</div>
                     <h2 className="text-xl font-bold text-blue-600 mb-4">Balance Total</h2>
                     
                     <div className="space-y-3">
