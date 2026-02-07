@@ -137,26 +137,63 @@ export default function EgresosPage() {
   };
 
   const guardarEdicion = async (id: number) => {
+    console.log("ID recibido en guardarEdicion:", id);
+  
+    if (!datosEdicion.descripcion.trim()) {
+      alert("La descripción es obligatoria");
+      return;
+    }
+  
+    if (!datosEdicion.monto || parseFloat(datosEdicion.monto) <= 0) {
+      alert("El monto debe ser mayor a 0");
+      return;
+    }
+  
+    if (!datosEdicion.categoria.trim()) {
+      alert("La categoría es obligatoria");
+      return;
+    }
+  
     try {
-      const response = await fetch(`/api/egresos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      // Asegúrate de tener el usuarioId disponible en tu estado/contexto
+      const usuarioId = usuario?.id; // ajusta según cómo obtienes el usuario
+  
+      const response = await fetch(`/api/egresos?id=${id}&usuarioId=${usuarioId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           descripcion: datosEdicion.descripcion,
           monto: parseFloat(datosEdicion.monto),
           categoria: datosEdicion.categoria,
           fecha: datosEdicion.fecha
-        })
+            ? new Date(datosEdicion.fecha).toISOString()
+            : new Date().toISOString(),
+          usuarioId, // importante: enviar también el usuarioId en el body
+        }),
       });
-
-      if (response.ok) {
-        setEgresoEditando(null);
-        cargarEgresos();
+  
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "No se pudo actualizar el egreso");
       }
+  
+      const data = await response.json();
+      console.log("Egreso actualizado:", data);
+  
+      setEgresoEditando(null);
+      setDatosEdicion({ descripcion: "", monto: "", categoria: "", fecha: "" });
+      cargarEgresos();
+      alert("Egreso actualizado exitosamente ✅");
     } catch (error) {
-      console.error('Error al actualizar egreso:', error);
+      console.error("Error al actualizar egreso:", error);
+      alert(
+        `Error al actualizar el egreso: ${
+          error instanceof Error ? error.message : "Error desconocido"
+        }`
+      );
     }
   };
+  
 
   const cancelarEdicion = () => {
     setEgresoEditando(null);
@@ -406,7 +443,7 @@ export default function EgresosPage() {
                             <td className="px-4 py-3">
                               <div className="flex flex-col sm:flex-row gap-2 justify-center">
                                 <button
-                                  onClick={() => guardarEdicion(egreso.id)}
+                                  onClick={() => guardarEdicion(Number(egreso.id))}
                                   className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition"
                                 >
                                   Guardar
